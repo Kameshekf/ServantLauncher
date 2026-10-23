@@ -1,0 +1,881 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:views="using:ServantLauncher.Views"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             DragDrop.AllowDrop="True"
+             x:Class="ServantLauncher.Views.ProfileDetailsView"
+             x:DataType="vm:ProfileDetailsViewModel">
+
+  <Grid>
+    <Grid RowDefinitions="Auto,*">
+      
+      <!-- TOP PROFILE HERO HEADER (matches media_1789669080903.png) -->
+      <Border Grid.Row="0" Classes="glass-card" Margin="24,16,24,12" Padding="16,14">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          
+          <!-- Left: Profile Icon & Info -->
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+            <!-- Profile Icon (Clickable to change & crop) -->
+            <Button Classes="btn-ghost" Click="OnChangeIconClicked" ToolTip.Tip="Нажмите, чтобы настроить и обрезать картинку сборки" Width="54" Height="54" Padding="0" CornerRadius="14" VerticalAlignment="Center">
+              <Border Width="54" Height="54" CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" ClipToBounds="True">
+                <Panel>
+                  <Image Source="{Binding Profile.IconBitmap}" IsVisible="{Binding Profile.HasCustomIcon}" Width="54" Height="54" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                  <PathIcon Data="{Binding IconGeometry}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !Profile.HasCustomIcon}" />
+                </Panel>
+              </Border>
+            </Button>
+
+            <!-- Profile Metadata -->
+            <StackPanel Spacing="3" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="{Binding Profile.Name}" Classes="heading" FontSize="20" FontWeight="Black" Foreground="White" />
+                <Border Background="{DynamicResource BrandPrimaryBrush}" CornerRadius="8" Padding="8,2" IsVisible="{Binding IsServerProfile}">
+                  <TextBlock Text="СЕРВЕР" FontSize="10" FontWeight="Black" Foreground="White" />
+                </Border>
+              </StackPanel>
+
+              <!-- Subtitle row 1: Loader • Version • Playtime -->
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="{Binding Profile.LoaderType}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="•" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="{Binding Profile.GameVersion}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <TextBlock Text="•" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                  <PathIcon Data="{StaticResource IconClock}" Width="11" Height="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding PlayTimeDisplay, StringFormat='Наиграно: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+                </StackPanel>
+              </StackPanel>
+
+              <!-- Subtitle row 2: Last played -->
+              <TextBlock Text="{Binding Profile.FormattedLastPlayedDetailed, StringFormat='Последний запуск: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+              <!-- Launch Progress Bar in Header -->
+              <StackPanel Spacing="3" Margin="0,4,0,0" IsVisible="{Binding ShowProgressBar}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="{Binding LaunchStatusText}" FontSize="10" Foreground="{DynamicResource BrandAccentBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="1" Text="{Binding LaunchProgressPercent, StringFormat='{}{0:F0}%'}" FontSize="10" Foreground="{DynamicResource BrandAccentBrush}" FontWeight="Bold" />
+                </Grid>
+                <ProgressBar Value="{Binding LaunchProgressPercent}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="{DynamicResource BrandAccentBrush}" Background="#22FFFFFF" />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Center filler / Status text -->
+          <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="10,0" />
+
+          <!-- Right: Action Buttons -->
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <!-- Normal Play / Install Button (Emerald green) -->
+            <Button Classes="btn-emerald" Command="{Binding PlayCommand}" Padding="26,11" CornerRadius="14" IsVisible="{Binding !IsDangerButton}">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource IconPlay}" Width="15" Height="15" Foreground="#09090B" IsVisible="{Binding IsProfileInstalled}" />
+                <PathIcon Data="{StaticResource IconDownload}" Width="15" Height="15" Foreground="#09090B" IsVisible="{Binding !IsProfileInstalled}" />
+                <TextBlock Text="{Binding PlayButtonText}" Classes="heading" FontSize="13" FontWeight="Black" Foreground="#09090B" />
+              </StackPanel>
+            </Button>
+
+            <!-- Danger Cancel / Kill Button (Red) -->
+            <Button Classes="btn-danger" Command="{Binding PlayCommand}" Padding="22,11" CornerRadius="14" IsVisible="{Binding IsDangerButton}">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource IconX}" Width="14" Height="14" Foreground="White" />
+                <TextBlock Text="{Binding PlayButtonText}" Classes="heading" FontSize="12" FontWeight="Black" Foreground="White" />
+              </StackPanel>
+            </Button>
+
+            <!-- Settings Button -->
+            <Button Classes="btn-outline" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="Настройки сборки" Width="42" Height="42" Padding="0" CornerRadius="12">
+              <PathIcon Data="{StaticResource IconSettings}" Width="16" Height="16" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+
+            <!-- Back Button -->
+            <Button Classes="btn-outline" Command="{Binding GoBackCommand}" ToolTip.Tip="Назад ко всем сборкам" Width="42" Height="42" Padding="0" CornerRadius="12">
+              <PathIcon Data="{StaticResource IconChevronLeft}" Width="18" Height="18" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+          </StackPanel>
+
+        </Grid>
+      </Border>
+
+      <!-- TAB NAVIGATION & CONTENT -->
+      <Grid Grid.Row="1" RowDefinitions="Auto,*" Margin="24,0,24,20">
+        
+        <!-- Tab Bar Switcher (5 Main Tabs: Контент, Файлы, Миры, Скриншоты, Журнал) -->
+        <Border Grid.Row="0" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="18" Padding="4" HorizontalAlignment="Left" Margin="0,0,0,14" BorderBrush="#20FFFFFF" BorderThickness="1">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <RadioButton Content="Контент" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}" Click="OnTab0Clicked" FontSize="12" Padding="16,7" />
+            <RadioButton Content="Файлы" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}" Click="OnTab1Clicked" FontSize="12" Padding="16,7" />
+            <RadioButton Content="Миры" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}" Click="OnTab2Clicked" FontSize="12" Padding="16,7" />
+            <RadioButton Content="Скриншоты" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=3}" Click="OnTab3Clicked" FontSize="12" Padding="16,7" />
+            <RadioButton Content="Журнал" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=4}" Click="OnTab4Clicked" FontSize="12" Padding="16,7" />
+          </StackPanel>
+        </Border>
+
+        <!-- TAB 0: КОНТЕНТ (Installed Content Table or Modrinth Resource Finder) -->
+        <Grid Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+          
+          <!-- Content Drag and Drop Overlay -->
+          <Border Name="ContentDropOverlay" Background="#F00F0E17" CornerRadius="16" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="2" IsVisible="False" ZIndex="200" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+              <Border Width="64" Height="64" CornerRadius="32" Background="{DynamicResource CardBgHoverBrush}" HorizontalAlignment="Center">
+                <PathIcon Data="{StaticResource IconDownload}" Width="28" Height="28" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <TextBlock Text="Перетащите файлы сюда" FontSize="18" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" />
+              <TextBlock Text="Моды (.jar), ресурспаки (.zip), шейдеры или папки будут добавлены в сборку" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Border>
+
+          <!-- MODE A: INSTALLED CONTENT LIST (matches media_1789669080903.png) -->
+          <Grid RowDefinitions="Auto,Auto,Auto,*" IsVisible="{Binding !IsSearchingResources}">
+            
+            <!-- Row 0: Search bar + Action buttons -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+              <TextBox Grid.Column="0" Text="{Binding SearchContentQuery, Mode=TwoWay}" Watermark="{Binding InstalledMods.Count, StringFormat='Поиск {0} компонентов сборки...'}" Height="40" Margin="0,0,12,0" CornerRadius="12">
+                <TextBox.InnerLeftContent>
+                  <PathIcon Data="{StaticResource IconSearch}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" Margin="12,0,6,0" />
+                </TextBox.InnerLeftContent>
+              </TextBox>
+
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                <Button Classes="btn-outline" Click="OnAddFilesClicked" Padding="14,8" CornerRadius="12" ToolTip.Tip="Добавить файлы .jar или .zip в сборку">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                    <TextBlock Text="Добавить файлы" FontSize="12" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Button>
+
+                <Button Classes="btn-primary" Command="{Binding ShowFindResourcesCommand}" Padding="16,8" CornerRadius="12" ToolTip.Tip="Открыть каталог ресурсов Modrinth">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource IconSearch}" Width="14" Height="14" Foreground="White" />
+                    <TextBlock Text="Найти ресурсы" FontSize="12" FontWeight="Bold" Foreground="White" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </Grid>
+
+            <!-- Row 1: Filter bar (Sort ComboBox + Category Pills + Update buttons) -->
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,0,0,12">
+              <!-- Sort ComboBox -->
+              <ComboBox Grid.Column="0" SelectedIndex="{Binding ContentSortIndex, Mode=TwoWay}" Height="34" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                <ComboBoxItem Content="Название (А-Я)" />
+                <ComboBoxItem Content="Название (Я-А)" />
+                <ComboBoxItem Content="Включенные сначала" />
+              </ComboBox>
+
+              <!-- Category Filter Pills -->
+              <Border Grid.Column="1" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="16" Padding="3" BorderBrush="#18FFFFFF" BorderThickness="1" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                  <RadioButton Content="Всё" GroupName="ContentCategory" Classes="nav-pill" IsChecked="True" Command="{Binding SetFilterContentTypeCommand}" CommandParameter="all" FontSize="11" Padding="12,5" />
+                  <RadioButton Content="Моды" GroupName="ContentCategory" Classes="nav-pill" Command="{Binding SetFilterContentTypeCommand}" CommandParameter="mod" FontSize="11" Padding="12,5" />
+                  <RadioButton Content="Наборы ресурсов" GroupName="ContentCategory" Classes="nav-pill" Command="{Binding SetFilterContentTypeCommand}" CommandParameter="resourcepack" FontSize="11" Padding="12,5" />
+                  <RadioButton Content="Шейдеры" GroupName="ContentCategory" Classes="nav-pill" Command="{Binding SetFilterContentTypeCommand}" CommandParameter="shader" FontSize="11" Padding="12,5" />
+                  <RadioButton Content="Датапаки" GroupName="ContentCategory" Classes="nav-pill" Command="{Binding SetFilterContentTypeCommand}" CommandParameter="datapack" FontSize="11" Padding="12,5" />
+                </StackPanel>
+              </Border>
+
+              <!-- Right side: Update All & Refresh Status -->
+              <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Classes="btn-purple" Command="{Binding UpdateAllModsCommand}" IsVisible="{Binding AvailableUpdatesCount}" Padding="12,6" CornerRadius="10" ToolTip.Tip="Обновить все компоненты с доступными апдейтами">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="White" />
+                    <TextBlock Text="{Binding AvailableUpdatesCount, StringFormat='Обновить всё ({0})'}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                  </StackPanel>
+                </Button>
+
+                <Button Classes="btn-outline" Command="{Binding CheckModUpdatesCommand}" IsEnabled="{Binding !IsCheckingUpdates}" Width="34" Height="34" Padding="0" CornerRadius="10" ToolTip.Tip="Проверить наличие обновлений на Modrinth">
+                  <PathIcon Data="{StaticResource IconRefresh}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+              </StackPanel>
+            </Grid>
+
+            <!-- Row 2: Table Header -->
+            <Border Grid.Row="2" Background="{DynamicResource BtnOutlineBgBrush}" CornerRadius="10" Padding="16,8" Margin="0,0,0,8" BorderBrush="#15FFFFFF" BorderThickness="1">
+              <Grid ColumnDefinitions="*,180,140">
+                <TextBlock Grid.Column="0" Text="Проект" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Grid.Column="1" Text="Версия / Файл" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="Действия" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Right" />
+              </Grid>
+            </Border>
+
+            <!-- Row 3: Items Table List -->
+            <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+              <ItemsControl ItemsSource="{Binding FilteredInstalledMods}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Classes="glass-card" Margin="0,0,0,6" Padding="12,10" CornerRadius="14">
+                      <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                        
+                        <!-- Icon -->
+                        <Border Grid.Column="0" Width="38" Height="38" CornerRadius="10" Background="{DynamicResource CardBgHoverBrush}" Margin="0,0,12,0" ClipToBounds="True" VerticalAlignment="Center">
+                          <Panel>
+                            <Image Source="{Binding IconBitmap}" IsVisible="{Binding HasIconBitmap}" Width="38" Height="38" Stretch="UniformToFill" />
+                            <PathIcon Data="{StaticResource IconPuzzle}" Width="16" Height="16" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasIconBitmap}" />
+                          </Panel>
+                        </Border>
+
+                        <!-- Info (Click to open Modrinth details if available) -->
+                        <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).OpenInstalledModDetailsCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalAlignment="Center">
+                          <StackPanel Spacing="2">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="White" FontSize="13" TextTrimming="CharacterEllipsis" />
+                              <Border Background="#201C2E" CornerRadius="6" Padding="6,1" IsVisible="{Binding IsNotMod}">
+                                <TextBlock Text="{Binding ContentTypeDisplay}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                              </Border>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding Author, StringFormat='от {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" IsVisible="{Binding HasAuthor}" />
+                              <TextBlock Text="{Binding DisplaySize}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                            </StackPanel>
+                          </StackPanel>
+                        </Button>
+
+                        <!-- Version & File Name -->
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2" Margin="10,0,20,0">
+                          <Border Background="#1C1B26" CornerRadius="6" Padding="8,2" IsVisible="{Binding HasVersionNumber}">
+                            <TextBlock Text="{Binding VersionNumber}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" />
+                          </Border>
+                          <TextBlock Text="{Binding FileName}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" TextTrimming="CharacterEllipsis" MaxWidth="160" HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Actions (Update button, Toggle Switch, Delete) -->
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                          <!-- Update button if available -->
+                          <Button Classes="btn-emerald" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).UpdateSingleModCommand}" CommandParameter="{Binding}" IsVisible="{Binding HasUpdate}" Height="30" Padding="10,0" CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                              <PathIcon Data="{StaticResource IconDownload}" Width="10" Height="10" Foreground="#09090B" />
+                              <TextBlock Text="Обновить" FontSize="10" FontWeight="Black" Foreground="#09090B" />
+                            </StackPanel>
+                          </Button>
+
+                          <!-- Toggle Switch -->
+                          <ToggleSwitch IsChecked="{Binding IsEnabled, Mode=OneWay}" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).ToggleModCommand}" CommandParameter="{Binding}" OnContent="" OffContent="" Margin="0" VerticalAlignment="Center" />
+
+                          <!-- Delete Button -->
+                          <Button Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).DeleteModCommand}" CommandParameter="{Binding}" ToolTip.Tip="Удалить файл" Width="32" Height="32" Padding="0" CornerRadius="8">
+                            <PathIcon Data="{StaticResource IconTrash}" Width="13" Height="13" Foreground="#EF4444" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Button>
+                        </StackPanel>
+
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+
+          </Grid>
+
+          <!-- MODE B: MODRINTH RESOURCE FINDER (matches media_1789669192988.png) -->
+          <Grid RowDefinitions="Auto,*,Auto" IsVisible="{Binding IsSearchingResources}">
+            
+            <!-- Top search and filter bar -->
+            <Grid Grid.Row="0" RowDefinitions="Auto,Auto" Margin="0,0,0,14">
+              <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,0,0,10">
+                <Button Grid.Column="0" Classes="btn-outline" Command="{Binding ShowContentListCommand}" ToolTip.Tip="Назад к списку контента" Width="38" Height="38" Padding="0" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                  <PathIcon Data="{StaticResource IconChevronLeft}" Width="16" Height="16" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+
+                <TextBlock Grid.Column="1" Text="Поиск ресурсов" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" VerticalAlignment="Center" Margin="0,0,18,0" />
+
+                <!-- Category Pills (Моды, Наборы ресурсов, Наборы данных, Шейдеры) -->
+                <Border Grid.Column="2" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="16" Padding="3" BorderBrush="#18FFFFFF" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Center">
+                  <StackPanel Orientation="Horizontal" Spacing="2">
+                    <RadioButton Content="Моды" GroupName="ResourceFinderCat" Classes="nav-pill" IsChecked="True" Command="{Binding SetResourceFinderTypeCommand}" CommandParameter="mod" FontSize="11" Padding="12,5" />
+                    <RadioButton Content="Наборы ресурсов" GroupName="ResourceFinderCat" Classes="nav-pill" Command="{Binding SetResourceFinderTypeCommand}" CommandParameter="resourcepack" FontSize="11" Padding="12,5" />
+                    <RadioButton Content="Наборы данных" GroupName="ResourceFinderCat" Classes="nav-pill" Command="{Binding SetResourceFinderTypeCommand}" CommandParameter="datapack" FontSize="11" Padding="12,5" />
+                    <RadioButton Content="Шейдеры" GroupName="ResourceFinderCat" Classes="nav-pill" Command="{Binding SetResourceFinderTypeCommand}" CommandParameter="shader" FontSize="11" Padding="12,5" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+
+              <!-- Search TextBox -->
+              <TextBox Grid.Row="1" Text="{Binding ResourceFinderQuery, Mode=TwoWay}" Watermark="Поиск ресурсов на Modrinth (начните вводить название)..." Height="42" CornerRadius="12">
+                <TextBox.InnerLeftContent>
+                  <PathIcon Data="{StaticResource IconSearch}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" Margin="12,0,4,0" />
+                </TextBox.InnerLeftContent>
+              </TextBox>
+            </Grid>
+
+            <!-- Results List -->
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+              <ItemsControl ItemsSource="{Binding ResourceSearchResults}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border Classes="glass-card" Margin="0,0,0,10" Padding="16">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        
+                        <!-- Icon -->
+                        <Border Grid.Column="0" Width="52" Height="52" CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" Margin="0,0,16,0" ClipToBounds="True" VerticalAlignment="Center">
+                          <Panel>
+                            <Image Source="{Binding IconBitmap}" IsVisible="{Binding HasIconBitmap}" Width="52" Height="52" Stretch="UniformToFill" />
+                            <PathIcon Data="{StaticResource IconBoxes}" Width="20" Height="20" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasIconBitmap}" />
+                          </Panel>
+                        </Border>
+
+                        <!-- Clickable Info Area -->
+                        <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).OpenModDetailsCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalAlignment="Center">
+                          <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                              <TextBlock Text="{Binding Title}" Classes="heading" FontSize="14" FontWeight="Bold" Foreground="White" />
+                              <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="6,2">
+                                <TextBlock Text="{Binding Author, StringFormat='от {0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                              </Border>
+                              <Border Background="#1E1C28" CornerRadius="6" Padding="6,2">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                  <PathIcon Data="{StaticResource IconDownload}" Width="9" Height="9" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                                  <TextBlock Text="{Binding FormattedDownloads}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                                </StackPanel>
+                              </Border>
+                            </StackPanel>
+
+                            <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxLines="2" />
+                            <TextBlock Text="{Binding DisplayCategories}" FontSize="10" Foreground="{DynamicResource BrandAccentBrush}" />
+                          </StackPanel>
+                        </Button>
+
+                        <!-- Action Button (Installed badge vs Install button) -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                          <Border Background="#14281E" BorderBrush="#22C55E" BorderThickness="1" CornerRadius="10" Padding="14,8" IsVisible="{Binding IsInstalled}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <PathIcon Data="{StaticResource IconCheck}" Width="12" Height="12" Foreground="#22C55E" />
+                              <TextBlock Text="Установлен" FontSize="11" FontWeight="Bold" Foreground="#22C55E" />
+                            </StackPanel>
+                          </Border>
+
+                          <Button Classes="btn-primary" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).QuickInstallResourceCommand}" CommandParameter="{Binding}" IsVisible="{Binding !IsInstalled}" Padding="16,8" CornerRadius="10">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                              <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="White" />
+                              <TextBlock Text="Установить" FontSize="11" FontWeight="Bold" Foreground="White" />
+                            </StackPanel>
+                          </Button>
+                        </StackPanel>
+
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Pagination Bar -->
+            <Border Grid.Row="2" Margin="0,10,0,4" HorizontalAlignment="Center" IsVisible="{Binding HasMultipleResourcePages}">
+              <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <Button Classes="btn-outline" Command="{Binding PrevResourcePageCommand}" IsEnabled="{Binding CanGoPrevResourcePage}" Padding="12,6" CornerRadius="10">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource IconChevronLeft}" Width="12" Height="12" Foreground="White" />
+                    <TextBlock Text="Назад" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                  </StackPanel>
+                </Button>
+
+                <Border Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" CornerRadius="10" Padding="14,6">
+                  <TextBlock Text="{Binding ResourcePaginationInfo}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                </Border>
+
+                <Button Classes="btn-outline" Command="{Binding NextResourcePageCommand}" IsEnabled="{Binding CanGoNextResourcePage}" Padding="12,6" CornerRadius="10">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="Вперед" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                    <PathIcon Data="{StaticResource IconChevronRight}" Width="12" Height="12" Foreground="White" />
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </Border>
+
+          </Grid>
+
+        </Grid>
+
+        <!-- TAB 1: ФАЙЛЫ (Quick Access Folder Cards) -->
+        <ScrollViewer Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="14">
+            <TextBlock Text="Папки сборки в файловой системе" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,0,4" />
+            
+            <WrapPanel Orientation="Horizontal">
+              <!-- Game root folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconFolder}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Папка сборки" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text=".minecraft (корень)" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenGameFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Mods folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconPuzzle}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Модификации" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="mods/*.jar" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenModsFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Resourcepacks folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconImage}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Наборы ресурсов" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="resourcepacks/*.zip" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenResourcePacksFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Shaderpacks folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconLayers}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Шейдеры" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="shaderpacks/*.zip" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenShaderPacksFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Saves folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconServer}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Сохранения (Миры)" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="saves/*" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenSavesFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Screenshots folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconCamera}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Скриншоты" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="screenshots/*" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenScreenshotsFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Datapacks folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconBoxes}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Датапаки сборки" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="datapacks/*" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenDataPacksFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+
+              <!-- Config folder -->
+              <Border Classes="glass-card" Width="330" Margin="0,0,12,12" Padding="16">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconSettings}" Width="24" Height="24" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Конфигурация" FontWeight="Bold" FontSize="13" Foreground="White" />
+                    <TextBlock Text="config/*" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="btn-outline" Command="{Binding OpenConfigFolderCommand}" ToolTip.Tip="Открыть в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                    <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Button>
+                </Grid>
+              </Border>
+            </WrapPanel>
+          </StackPanel>
+        </ScrollViewer>
+
+        <!-- TAB 2: МИРЫ (Saves scanned from saves/) -->
+        <Grid Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}" RowDefinitions="Auto,*">
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+            <TextBlock Grid.Column="0" Text="{Binding Worlds.Count, StringFormat='Сохраненные миры ({0})'}" Classes="heading" FontSize="15" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+              <Button Classes="btn-outline" Command="{Binding OpenSavesFolderCommand}" Padding="14,8" CornerRadius="12">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Data="{StaticResource IconFolder}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Text="Папка saves" FontSize="11" FontWeight="SemiBold" />
+                </StackPanel>
+              </Button>
+              <Button Classes="btn-outline" Command="{Binding RefreshWorldsCommand}" ToolTip.Tip="Обновить список миров" Width="36" Height="36" Padding="0" CornerRadius="12">
+                <PathIcon Data="{StaticResource IconRefresh}" Width="13" Height="13" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Button>
+            </StackPanel>
+          </Grid>
+
+          <!-- Empty State -->
+          <Border Grid.Row="1" Classes="glass-card" Padding="40" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !Worlds.Count}">
+            <StackPanel Spacing="12" HorizontalAlignment="Center">
+              <PathIcon Data="{StaticResource IconServer}" Width="48" Height="48" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+              <TextBlock Text="В этой сборке пока нет сохраненных миров" FontWeight="Bold" FontSize="14" Foreground="White" HorizontalAlignment="Center" />
+              <TextBlock Text="Запустите игру и создайте мир, чтобы управлять им здесь." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Border>
+
+          <!-- Worlds List -->
+          <ScrollViewer Grid.Row="1" IsVisible="{Binding Worlds.Count}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Worlds}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="glass-card" Margin="0,0,0,10" Padding="16">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                      <!-- World Icon -->
+                      <Border Grid.Column="0" Width="48" Height="48" CornerRadius="12" Background="{DynamicResource CardBgHoverBrush}" Margin="0,0,14,0" ClipToBounds="True" VerticalAlignment="Center">
+                        <Panel>
+                          <Image Source="{Binding IconBitmap}" IsVisible="{Binding HasIconBitmap}" Width="48" Height="48" Stretch="UniformToFill" />
+                          <PathIcon Data="{StaticResource IconServer}" Width="20" Height="20" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasIconBitmap}" />
+                        </Panel>
+                      </Border>
+
+                      <!-- World Details -->
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" Foreground="White" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding FormattedLastPlayed, StringFormat='Сыграно: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="{Binding FormattedSize}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                        </StackPanel>
+                      </StackPanel>
+
+                      <!-- World Actions -->
+                      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Button Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).OpenWorldDataPacksCommand}" CommandParameter="{Binding}" ToolTip.Tip="Открыть папку датапаков этого мира" Padding="12,8" CornerRadius="10">
+                          <StackPanel Orientation="Horizontal" Spacing="6">
+                            <PathIcon Data="{StaticResource IconBoxes}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                            <TextBlock Text="Датапаки" FontSize="11" FontWeight="SemiBold" />
+                          </StackPanel>
+                        </Button>
+                        <Button Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ProfileDetailsViewModel)DataContext).OpenWorldFolderCommand}" CommandParameter="{Binding}" ToolTip.Tip="Открыть папку мира в проводнике" Width="36" Height="36" Padding="0" CornerRadius="10">
+                          <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+
+        <!-- TAB 3: СКРИНШОТЫ (Profile Screenshots Gallery) -->
+        <Grid Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=3}">
+          <views:ScreenshotsView DataContext="{Binding ProfileScreenshotsVm}" />
+        </Grid>
+
+        <!-- TAB 4: ЖУРНАЛ (Console and Game Logs) -->
+        <Grid Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=4}">
+          <views:ConsoleView DataContext="{Binding ConsoleVm}" />
+        </Grid>
+
+        <!-- TAB 5: PROFILE SETTINGS -->
+        <ScrollViewer Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=5}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="18" MaxWidth="700" HorizontalAlignment="Left">
+            
+            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,4">
+              <Button Grid.Column="0" Classes="btn-outline" Click="OnTab0Clicked" Padding="12,6" CornerRadius="10" Margin="0,0,12,0">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Data="{StaticResource IconChevronLeft}" Width="12" Height="12" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="К сборке" FontSize="11" FontWeight="SemiBold" />
+                </StackPanel>
+              </Button>
+              <TextBlock Grid.Column="1" Text="Настройки сборки" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" VerticalAlignment="Center" />
+            </Grid>
+
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Название сборки" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBox Text="{Binding Profile.Name, Mode=TwoWay}" Watermark="Название..." />
+              </StackPanel>
+            </Border>
+
+            <!-- Profile Image & Icon Card with Cropping Tool -->
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="16">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="Изображение и иконка сборки (Кадрирование / Кроп)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Text="Загрузите собственную картинку для сборки, обрежьте и масштабируйте её с помощью интерактивного кропа или выберите стандартный значок." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- Current Image Preview & Management Row -->
+                <Grid ColumnDefinitions="Auto,*">
+                  <!-- Large Preview Box (88x88) -->
+                  <Border Grid.Column="0" Width="88" Height="88" CornerRadius="18" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" ClipToBounds="True" Margin="0,0,18,0" VerticalAlignment="Center">
+                    <Panel>
+                      <Image Source="{Binding Profile.IconBitmap}" IsVisible="{Binding HasCustomIcon}" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                      <PathIcon Data="{StaticResource IconBoxes}" Width="36" Height="36" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasCustomIcon}" />
+                    </Panel>
+                  </Border>
+
+                  <!-- Controls next to preview -->
+                  <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
+                    <WrapPanel Orientation="Horizontal">
+                      <Button Classes="btn-primary" Click="OnUploadCustomImageClicked" Padding="14,8" Margin="0,0,8,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconFolder}" Width="13" Height="13" Foreground="White" />
+                          <TextBlock Text="Загрузить картинку..." FontSize="11" FontWeight="Bold" Foreground="White" />
+                        </StackPanel>
+                      </Button>
+
+                      <Button Classes="btn-purple" Command="{Binding OpenCropCurrentIconCommand}" IsVisible="{Binding HasCustomIcon}" ToolTip.Tip="Открыть инструмент кадрирования и обрезки (зум, перемещение, кроп)" Padding="14,8" Margin="0,0,8,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="White" />
+                          <TextBlock Text="Обрезать / Кроп" FontSize="11" FontWeight="Bold" Foreground="White" />
+                        </StackPanel>
+                      </Button>
+
+                      <Button Classes="btn-outline" Command="{Binding ResetCustomIconCommand}" IsVisible="{Binding HasCustomIcon}" ToolTip.Tip="Сбросить на стандартную иконку" Padding="12,8" Margin="0,0,8,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconRefresh}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="Сбросить" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                        </StackPanel>
+                      </Button>
+                    </WrapPanel>
+
+                    <!-- Resolution & Info -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasCustomIcon}">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Разрешение иконки:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentIconResolution}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </StackPanel>
+                  </StackPanel>
+                </Grid>
+
+                <Separator Background="{DynamicResource BorderCardBrush}" Height="1" Margin="0,4" />
+
+                <!-- Standard Preset Icons -->
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Либо выберите стандартный значок:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                  <WrapPanel Orientation="Horizontal">
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="sword" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconSword}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Меч" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="pickaxe" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconPickaxe}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Кирка" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="diamond" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconDiamond}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Алмаз" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="creeper" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconShield}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Щит" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="redstone" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconZap}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Редстоун" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="book" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconFileText}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Книга" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="portal" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconLayers}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Портал" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="gear" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconSettings}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Механизм" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="grass" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconBoxes}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Блок" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                    <Button Classes="btn-outline" Command="{Binding SetIconPresetCommand}" CommandParameter="default" Margin="0,0,8,8" Padding="10,6">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconBoxes}" Width="13" Height="13" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBlock Text="Стандарт" FontSize="11" />
+                      </StackPanel>
+                    </Button>
+                  </WrapPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Resolution Card -->
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Разрешение и режим экрана" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <CheckBox IsChecked="{Binding Profile.UseGlobalResolution, Mode=TwoWay}" Content="Использовать глобальные параметры лаунчера" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+
+                <StackPanel Spacing="8" IsVisible="{Binding !Profile.UseGlobalResolution}">
+                  <CheckBox IsChecked="{Binding Profile.UseFullScreen, Mode=TwoWay}" Content="Запускать во весь экран (--fullscreen)" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                  <Grid ColumnDefinitions="Auto,*,Auto,*" IsVisible="{Binding !Profile.UseFullScreen}">
+                    <TextBlock Grid.Column="0" Text="Ширина:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Grid.Column="1" Text="{Binding Profile.GameWindowWidth, Mode=TwoWay}" Margin="0,0,12,0" />
+                    <TextBlock Grid.Column="2" Text="Высота:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Grid.Column="3" Text="{Binding Profile.GameWindowHeight, Mode=TwoWay}" />
+                  </Grid>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Automation Card -->
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Автоматизация сборки (Скрипты и команды)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="Индивидуальные команды до и после запуска этой сборки:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Команда ДО запуска игры:" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBox Text="{Binding Profile.PreLaunchCommand, Mode=TwoWay}" Watermark="powershell.exe -c ..." />
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Команда ПОСЛЕ закрытия игры:" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBox Text="{Binding Profile.PostLaunchCommand, Mode=TwoWay}" Watermark="cmd.exe /c echo Finished" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="Выделение памяти (RAM)" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Profile.AllocatedRamMb, StringFormat='{}{0} MB'}" FontSize="12" FontWeight="Bold" Foreground="White" />
+                </Grid>
+                <Slider Minimum="1024" Maximum="16384" SmallChange="512" LargeChange="1024" Value="{Binding Profile.AllocatedRamMb, Mode=TwoWay}" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Дополнительные аргументы JVM" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBox Text="{Binding Profile.JvmArgs, Mode=TwoWay}" Watermark="-XX:+UseG1GC..." />
+              </StackPanel>
+            </Border>
+
+            <!-- Quick Folders Card -->
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="14">
+                <TextBlock Text="Быстрый доступ к файлам сборки" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <WrapPanel Orientation="Horizontal">
+                  <Button Classes="btn-outline" Command="{Binding OpenGameFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Папка игры (.minecraft)" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding OpenModsFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconPuzzle}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Моды (mods)" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding OpenResourcePacksFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconImage}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Ресурспаки (resourcepacks)" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding OpenShaderPacksFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconLayers}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Шейдеры (shaderpacks)" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding OpenSavesFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconServer}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Миры (saves)" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding OpenScreenshotsFolderCommand}" Margin="0,0,10,10" Padding="14,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconImage}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="Скриншоты" FontSize="12" />
+                    </StackPanel>
+                  </Button>
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Actions Card -->
+            <Border Classes="glass-card" Padding="20">
+              <StackPanel Spacing="14">
+                <TextBlock Text="Действия со сборкой" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                <WrapPanel>
+                  <Button Classes="btn-outline" Click="OnExportMrpackClicked" Margin="0,0,10,10" Padding="16,8" ToolTip.Tip="Экспортировать сборку в универсальный формат .mrpack для Modrinth">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconDownload}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                      <TextBlock Text="Экспорт в .mrpack" FontSize="12" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding DuplicateCommand}" Margin="0,0,10,10" Padding="16,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconDuplicate}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                      <TextBlock Text="Клонировать сборку" FontSize="12" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </Button>
+                  <Button Classes="btn-outline" Command="{Binding DeleteCommand}" Margin="0,0,10,10" Padding="16,8" IsVisible="{Binding CanDelete}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <PathIcon Data="{StaticResource IconTrash}" Width="14" Height="14" Foreground="#EF4444" />
+                      <TextBlock Text="Удалить сборку" FontSize="12" FontWeight="SemiBold" Foreground="#EF4444" />
+                    </StackPanel>
+                  </Button>
+                </WrapPanel>
+                <TextBlock Text="{Binding ExportMrpackStatus}" FontSize="11" Foreground="{DynamicResource EmeraldOnlineBrush}" IsVisible="{Binding ExportMrpackStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              </StackPanel>
+            </Border>
+
+            <Button Classes="btn-primary" Command="{Binding SaveProfileChangesCommand}" Content="Сохранить настройки" Padding="24,10" HorizontalAlignment="Right" />
+
+          </StackPanel>
+        </ScrollViewer>
+
+      </Grid>
+    </Grid>
+
+    <!-- MOD DETAILS MODAL OVERLAY -->
+    <Border Background="#B0000000" IsVisible="{Binding IsModDetailsOpen}">
+      <views:ModDetailsDialog DataContext="{Binding ActiveModDetailsVm}" />
+    </Border>
+
+    <!-- IMAGE CROPPER MODAL OVERLAY -->
+    <Border Background="#C0000000" IsVisible="{Binding IsCropDialogOpen}">
+      <views:ImageCropDialog DataContext="{Binding CropDialogVm}" />
+    </Border>
+
+  </Grid>
+</UserControl>

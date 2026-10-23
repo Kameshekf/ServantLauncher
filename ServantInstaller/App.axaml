@@ -1,0 +1,288 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:ServantInstaller"
+             x:Class="ServantInstaller.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <local:IntEqualsConverter x:Key="IntEqualsConverter" />
+
+      <!-- Fonts -->
+      <FontFamily x:Key="GoogleSansFont">avares://ServantSetup/Assets/Fonts/Google_Sans/GoogleSans-VariableFont_GRAD,opsz,wght.ttf#Google Sans</FontFamily>
+      <FontFamily x:Key="UnboundedFont">avares://ServantSetup/Assets/Fonts/Unbounded/Unbounded-VariableFont_wght.ttf#Unbounded</FontFamily>
+
+      <!-- System Accent Overrides (guarantees no Windows red theme bleeding) -->
+      <Color x:Key="SystemAccentColor">#8B5CF6</Color>
+      <Color x:Key="SystemAccentColorLight1">#A78BFA</Color>
+      <Color x:Key="SystemAccentColorLight2">#C4B5FD</Color>
+      <Color x:Key="SystemAccentColorLight3">#DDD6FE</Color>
+      <Color x:Key="SystemAccentColorDark1">#7C3AED</Color>
+      <Color x:Key="SystemAccentColorDark2">#6D28D9</Color>
+      <Color x:Key="SystemAccentColorDark3">#5B21B6</Color>
+
+      <!-- Custom Servant Palette -->
+      <SolidColorBrush x:Key="BgDarkBrush" Color="#0B0912" />
+      <SolidColorBrush x:Key="HeaderBgBrush" Color="#13101E" />
+      <SolidColorBrush x:Key="CardBgBrush" Color="#141120" />
+      <SolidColorBrush x:Key="CardBgHoverBrush" Color="#1B172C" />
+      <SolidColorBrush x:Key="BrandPrimaryBrush" Color="#7C3AED" />
+      <SolidColorBrush x:Key="BrandPrimaryHoverBrush" Color="#8B5CF6" />
+      <SolidColorBrush x:Key="BrandPurpleBrush" Color="#6D28D9" />
+      <SolidColorBrush x:Key="BrandPurpleLightBrush" Color="#8B5CF6" />
+      <SolidColorBrush x:Key="BrandAccentBrush" Color="#C084FC" />
+      <SolidColorBrush x:Key="BrandAccentBorderBrush" Color="#55A855F7" />
+      <SolidColorBrush x:Key="BrandAccentAlphaBrush" Color="#228B5CF6" />
+      <SolidColorBrush x:Key="BorderSubtleBrush" Color="#18FFFFFF" />
+      <SolidColorBrush x:Key="BorderCardBrush" Color="#22FFFFFF" />
+      <SolidColorBrush x:Key="BorderPurpleBrush" Color="#558B5CF6" />
+      <SolidColorBrush x:Key="TextBrightBrush" Color="#F8FAFC" />
+      <SolidColorBrush x:Key="TextMutedBrush" Color="#94A3B8" />
+      <SolidColorBrush x:Key="EmeraldOnlineBrush" Color="#34D399" />
+
+      <!-- Explicit CheckBox Theme Brushes -->
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUnchecked" Color="#171424" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#7C3AED" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#8B5CF6" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#6D28D9" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#3D3852" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#8B5CF6" />
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#FFFFFF" />
+
+      <!-- Explicit Slider Theme Brushes -->
+      <SolidColorBrush x:Key="SliderTrackValueFill" Color="#8B5CF6" />
+      <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#A78BFA" />
+      <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#7C3AED" />
+      <SolidColorBrush x:Key="SliderThumbBackground" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#EDE9FE" />
+      <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#DDD6FE" />
+      <SolidColorBrush x:Key="SliderTrackFill" Color="#1E1B2C" />
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Dark"
+                               Accent="#8B5CF6"
+                               AltHigh="#0B0912"
+                               AltLow="#13101E"
+                               BaseHigh="#F8FAFC"
+                               BaseLow="#20FFFFFF"
+                               BaseMedium="#94A3B8"
+                               ChromeAltLow="#181528"
+                               ChromeBlackHigh="#0B0912"
+                               ChromeBlackLow="#13101E"
+                               ChromeBlackMedium="#181528"
+                               ChromeBlackMediumLow="#151222"
+                               ChromeDisabledHigh="#40FFFFFF"
+                               ChromeDisabledLow="#18FFFFFF"
+                               ChromeHigh="#26213D"
+                               ChromeLow="#151222"
+                               ChromeMedium="#1E1B2E"
+                               ChromeMediumLow="#181528"
+                               ChromeWhite="#FFFFFF"
+                               ListLow="#181528"
+                               ListMedium="#221D38"
+                               RegionColor="#0B0912" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+
+    <!-- Global Typography -->
+    <Style Selector="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.heading">
+      <Setter Property="FontFamily" Value="{StaticResource UnboundedFont}" />
+      <Setter Property="FontWeight" Value="Black" />
+    </Style>
+
+    <!-- Glass Cards -->
+    <Style Selector="Border.glass-card">
+      <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderCardBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="14" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
+          <BrushTransition Property="Background" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
+
+    <Style Selector="Border.glass-card:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderPurpleBrush}" />
+    </Style>
+
+    <!-- Primary Action Button -->
+    <Style Selector="Button.btn-primary">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0.0" Color="#8B5CF6" />
+            <GradientStop Offset="1.0" Color="#6D28D9" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="20,12" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+          <BrushTransition Property="Background" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.btn-primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Offset="0.0" Color="#9A6BFA" />
+            <GradientStop Offset="1.0" Color="#7C3AED" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.btn-primary:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.98)" />
+    </Style>
+
+    <!-- Outline Button -->
+    <Style Selector="Button.btn-outline">
+      <Setter Property="Background" Value="#181525" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderCardBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.2" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.btn-outline:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#251F3A" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BrandAccentBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource BrandAccentBrush}" />
+    </Style>
+
+    <!-- Preset Pill Button (for RAM quick pickers) -->
+    <Style Selector="Button.btn-pill">
+      <Setter Property="Background" Value="#171424" />
+      <Setter Property="BorderBrush" Value="#25FFFFFF" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Padding" Value="10,4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.15" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+          <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.btn-pill:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#261E3E" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BrandAccentBorderBrush}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Close Button -->
+    <Style Selector="Button.btn-close">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="Width" Value="32" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="CornerRadius" Value="16" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.15" />
+          <BrushTransition Property="Foreground" Duration="0:0:0.15" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.btn-close:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2AEE4444" />
+      <Setter Property="Foreground" Value="#EF4444" />
+    </Style>
+
+    <!-- Custom Modern TextBox -->
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="#100E19" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderCardBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="12,8" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource BrandAccentBorderBrush}" />
+      <Setter Property="Background" Value="#141120" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource BrandAccentBrush}" />
+      <Setter Property="Background" Value="#171325" />
+    </Style>
+
+    <!-- CheckBox Styling -->
+    <Style Selector="CheckBox">
+      <Setter Property="FontFamily" Value="{StaticResource GoogleSansFont}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrightBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">
+      <Setter Property="BorderBrush" Value="{DynamicResource BrandAccentBorderBrush}" />
+    </Style>
+
+    <!-- Slider Styling -->
+    <Style Selector="Slider">
+      <Setter Property="Foreground" Value="{DynamicResource BrandPrimaryBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!-- ProgressBar -->
+    <Style Selector="ProgressBar">
+      <Setter Property="Height" Value="8" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Background" Value="#181527" />
+      <Setter Property="Foreground">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+            <GradientStop Offset="0.0" Color="#8B5CF6" />
+            <GradientStop Offset="1.0" Color="#C084FC" />
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+  </Application.Styles>
+</Application>

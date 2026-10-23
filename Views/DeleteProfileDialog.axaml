@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="400"
+             x:Class="ServantLauncher.Views.DeleteProfileDialog"
+             x:DataType="vm:DeleteProfileViewModel">
+
+  <Border Classes="glass-card" Background="#F60F0E17" BorderBrush="#DC2626" BorderThickness="1.5" CornerRadius="22" Padding="26" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Spacing="18">
+      
+      <!-- Header -->
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Border Grid.Column="0" Width="40" Height="40" CornerRadius="12" Background="#281116" BorderBrush="#DC2626" BorderThickness="1" Margin="0,0,14,0" VerticalAlignment="Center">
+          <PathIcon Data="{StaticResource IconTrash}" Width="18" Height="18" Foreground="#EF4444" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+          <TextBlock Text="УДАЛЕНИЕ СБОРКИ" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Действие невозможно отменить!" FontSize="11" Foreground="#F87171" FontWeight="Bold" />
+        </StackPanel>
+
+        <Button Grid.Column="2" Classes="btn-outline" Command="{Binding CancelCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <!-- Warning Description Card -->
+      <Border Background="#14101A" BorderBrush="#35EF4444" BorderThickness="1" CornerRadius="14" Padding="14">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Вы собираетесь удалить сборку:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+          <TextBlock Text="{Binding TargetProfile.Name}" Classes="heading" FontSize="15" FontWeight="Bold" Foreground="White" />
+          <TextBlock Text="{Binding TargetProfile.DisplaySubtitle}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" />
+          
+          <Separator Background="#20FFFFFF" Height="1" Margin="0,4" />
+          
+          <TextBlock Text="⚠️ Будут безвозвратно удалены все установленные моды, сохранения миров, скриншоты и настройки этой сборки."
+                     FontSize="11" Foreground="#FCA5A5" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- Confirmation Checkbox -->
+      <Border Background="#100F17" CornerRadius="12" Padding="12,10" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+        <CheckBox IsChecked="{Binding IsDeleteConfirmed, Mode=TwoWay}"
+                  Foreground="White" FontWeight="SemiBold" FontSize="12">
+          <TextBlock Text="Я понимаю, что сборка и все её файлы будут удалены навсегда" TextWrapping="Wrap" FontSize="11" Foreground="White" VerticalAlignment="Center" />
+        </CheckBox>
+      </Border>
+
+      <!-- Action Buttons -->
+      <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,6,0,0">
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+          <Button Classes="btn-outline" Command="{Binding CancelCommand}" Content="Отмена" Padding="18,8" />
+          
+          <Button Classes="btn-close" Command="{Binding ConfirmDeleteCommand}" IsEnabled="{Binding IsDeleteConfirmed}" Padding="20,8" Height="38" CornerRadius="20">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconTrash}" Width="14" Height="14" Foreground="White" />
+              <TextBlock Text="УДАЛИТЬ СБОРКУ" FontWeight="Black" FontSize="12" Foreground="White" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+
+    </StackPanel>
+  </Border>
+</UserControl>

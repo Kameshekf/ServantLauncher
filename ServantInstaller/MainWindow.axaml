@@ -1,0 +1,200 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ServantInstaller"
+        mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="530"
+        x:Class="ServantInstaller.MainWindow"
+        x:DataType="vm:InstallerViewModel"
+        Title="Установка Servant Launcher"
+        Icon="avares://ServantSetup/Assets/Icons/app.ico"
+        Width="640" Height="530"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="52"
+        Background="Transparent">
+
+  <!-- Outer Shell with Subtle Border -->
+  <Border CornerRadius="16" BorderBrush="#358B5CF6" BorderThickness="1" ClipToBounds="True">
+    <Border.Background>
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Offset="0.0" Color="#0F0C18" />
+        <GradientStop Offset="0.5" Color="#0B0913" />
+        <GradientStop Offset="1.0" Color="#07060A" />
+      </LinearGradientBrush>
+    </Border.Background>
+
+    <Grid RowDefinitions="52,*">
+      
+      <!-- Custom Modern Titlebar -->
+      <Border Grid.Row="0" Background="#141122" BorderBrush="#1AFFFFFF" BorderThickness="0,0,0,1" Padding="18,0">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <!-- Brand and Badge -->
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <Border Width="30" Height="30" CornerRadius="8" Background="#1C182E" BorderBrush="#408B5CF6" BorderThickness="1" ClipToBounds="True">
+              <Image Source="avares://ServantSetup/Assets/Images/server-icon-rounded.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="SERVANT LAUNCHER" FontSize="13" FontWeight="Black" Foreground="White" LetterSpacing="0.8" VerticalAlignment="Center" />
+            <Border Background="#258B5CF6" BorderBrush="#508B5CF6" BorderThickness="1" CornerRadius="6" Padding="7,2" VerticalAlignment="Center">
+              <TextBlock Text="SETUP" FontSize="9" FontWeight="Black" Foreground="#C084FC" LetterSpacing="1" />
+            </Border>
+          </StackPanel>
+
+          <!-- Close Window Button -->
+          <Button Grid.Column="2" Classes="btn-close" Command="{Binding CancelCommand}" Content="✕" Width="30" Height="30" CornerRadius="15" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <!-- Main Content Area -->
+      <Panel Grid.Row="1" Margin="24,18">
+
+        <!-- STEP 0: INITIAL CONFIGURATION & SETUP -->
+        <Grid RowDefinitions="Auto,*,Auto" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+          
+          <!-- Hero Subtitle -->
+          <StackPanel Grid.Row="0" Spacing="3" Margin="0,0,0,12">
+            <TextBlock Text="Установка и первоначальная настройка" FontSize="16" FontWeight="Black" Foreground="White" />
+            <TextBlock Text="Лаунчер содержит встроенную среду .NET 9 и все системные библиотеки." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+
+          <!-- Configuration Cards -->
+          <StackPanel Grid.Row="1" Spacing="12" VerticalAlignment="Top">
+
+            <!-- Error Banner if any -->
+            <Border Background="#28EF4444" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="10" Padding="12,8" IsVisible="{Binding HasError}">
+              <TextBlock Text="{Binding ErrorMessage}" Foreground="#FCA5A5" FontSize="11" TextWrapping="Wrap" />
+            </Border>
+
+            <!-- Card 1: Install Directory -->
+            <Border Classes="glass-card" Padding="14,12">
+              <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <TextBlock Grid.Column="0" Text="Папка установки лаунчера:" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="~250 МБ свободного места" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBox Grid.Column="0" Text="{Binding InstallDirectory, Mode=TwoWay}" Height="36" Margin="0,0,8,0" VerticalContentAlignment="Center" />
+                  <Button Grid.Column="1" Classes="btn-outline" Click="OnBrowseInstallDirClicked" Content="Обзор..." Height="36" Padding="14,0" VerticalContentAlignment="Center" />
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <!-- Card 2: RAM Allocation -->
+            <Border Classes="glass-card" Padding="14,12">
+              <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Text="Выделение оперативной памяти (RAM):" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                  <Border Grid.Column="1" Background="#258B5CF6" BorderBrush="#508B5CF6" BorderThickness="1" CornerRadius="6" Padding="8,2">
+                    <TextBlock Text="{Binding RamFormattedText}" FontSize="11" FontWeight="Black" Foreground="#C084FC" />
+                  </Border>
+                </Grid>
+
+                <Slider Minimum="1024" Maximum="16384" SmallChange="512" LargeChange="1024" Value="{Binding AllocatedRamMb, Mode=TwoWay}" Margin="0,2,0,0" />
+
+                <!-- Preset Quick Buttons -->
+                <Grid ColumnDefinitions="*,*,*,*,*,*" Margin="0,2,0,0">
+                  <Button Grid.Column="0" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>2048</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="2 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                  <Button Grid.Column="1" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>4096</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="4 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                  <Button Grid.Column="2" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>6144</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="6 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                  <Button Grid.Column="3" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>8192</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="8 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                  <Button Grid.Column="4" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="2,0,2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>12288</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="12 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                  <Button Grid.Column="5" Classes="btn-pill" Command="{Binding SetRamCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                    <Button.CommandParameter><x:Int32>16384</x:Int32></Button.CommandParameter>
+                    <TextBlock Text="16 ГБ" FontSize="10" FontWeight="Bold" />
+                  </Button>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <!-- Card 3: Checkbox Options -->
+            <Border Classes="glass-card" Padding="14,12">
+              <Grid ColumnDefinitions="*,*">
+                <StackPanel Grid.Column="0" Spacing="8">
+                  <CheckBox IsChecked="{Binding CreateDesktopShortcut, Mode=TwoWay}" Content="Ярлык на Рабочем столе" FontSize="11" />
+                  <CheckBox IsChecked="{Binding CreateStartMenuShortcut, Mode=TwoWay}" Content="Ярлык в меню Пуск" FontSize="11" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="8">
+                  <CheckBox IsChecked="{Binding PreInstallJava21, Mode=TwoWay}" Content="Загрузить Java 21 OpenJDK" FontSize="11" />
+                  <CheckBox IsChecked="{Binding LaunchAfterInstall, Mode=TwoWay}" Content="Запустить сразу после установки" FontSize="11" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+          </StackPanel>
+
+          <!-- Primary Install Button -->
+          <Button Grid.Row="2" Classes="btn-primary" Command="{Binding StartInstallCommand}" HorizontalAlignment="Stretch" Height="46" Margin="0,14,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TextBlock Text="⚡" FontSize="13" VerticalAlignment="Center" />
+              <TextBlock Text="УСТАНОВИТЬ SERVANT LAUNCHER" FontSize="12" FontWeight="Black" LetterSpacing="0.8" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </Grid>
+
+        <!-- STEP 1: INSTALLING PROGRESS -->
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="480" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}">
+          <Border Classes="glass-card" Padding="32,28">
+            <StackPanel Spacing="16" HorizontalAlignment="Center">
+              
+              <Border Width="60" Height="60" CornerRadius="18" Background="#1A152C" BorderBrush="#508B5CF6" BorderThickness="1.5" HorizontalAlignment="Center">
+                <Image Source="avares://ServantSetup/Assets/Images/server-icon-rounded.png" Width="42" Height="42" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+
+              <TextBlock Text="УСТАНОВКА SERVANT LAUNCHER" FontSize="15" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" LetterSpacing="0.5" />
+              <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="400" />
+
+              <ProgressBar Minimum="0" Maximum="100" Value="{Binding InstallProgressPercent}" Height="8" CornerRadius="4" HorizontalAlignment="Stretch" />
+
+              <TextBlock Text="{Binding InstallProgressPercent, StringFormat='{}{0:0}%'}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- STEP 2: FINISHED SUCCESS -->
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="480" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}">
+          <Border Classes="glass-card" Padding="32,28">
+            <StackPanel Spacing="16" HorizontalAlignment="Center">
+              
+              <Border Width="60" Height="60" CornerRadius="30" Background="#1834D399" BorderBrush="#34D399" BorderThickness="2" HorizontalAlignment="Center">
+                <TextBlock Text="✓" FontSize="28" FontWeight="Black" Foreground="#34D399" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+
+              <TextBlock Text="УСТАНОВКА ЗАВЕРШЕНА!" FontSize="16" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" LetterSpacing="0.5" />
+              <TextBlock Text="Servant Launcher успешно установлен со всеми компонентами и готов к работе." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="380" />
+
+              <StackPanel Spacing="8" HorizontalAlignment="Stretch" Margin="0,8,0,0">
+                <Button Classes="btn-primary" Command="{Binding LaunchAndExitCommand}" HorizontalAlignment="Stretch" Height="44">
+                  <TextBlock Text="ЗАПУСТИТЬ ЛАУНЧЕР" FontSize="12" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+                <Button Classes="btn-outline" Command="{Binding CancelCommand}" HorizontalAlignment="Stretch" Height="38">
+                  <TextBlock Text="ЗАКРЫТЬ" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+              </StackPanel>
+
+            </StackPanel>
+          </Border>
+        </Grid>
+
+      </Panel>
+
+    </Grid>
+  </Border>
+</Window>

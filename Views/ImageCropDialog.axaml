@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="480"
+             x:Class="ServantLauncher.Views.ImageCropDialog"
+             x:DataType="vm:ImageCropViewModel">
+
+  <Border Classes="glass-card" Padding="24" CornerRadius="24" MaxWidth="640" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
+      
+      <!-- Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="НАСТРОЙКА И ОБРЕЗКА ИКОНКИ СБОРКИ" Classes="heading" FontSize="15" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Перетаскивайте изображение мышью и используйте ползунок масштаба." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CancelCommand}" Width="28" Height="28" Padding="0" CornerRadius="14">
+          <PathIcon Data="{StaticResource IconX}" Width="12" Height="12" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <!-- Main Area: Left Crop Viewport, Right Live Preview -->
+      <Grid Grid.Row="1" ColumnDefinitions="280,*" Margin="0,0,0,18">
+        
+        <!-- LEFT: Interactive Crop Box -->
+        <StackPanel Grid.Column="0" Spacing="12">
+          <!-- Crop Viewport with Pointer Events for Panning -->
+          <Border Width="240" Height="240" Background="#0C0A14" CornerRadius="20" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" ClipToBounds="True" HorizontalAlignment="Center" PointerPressed="OnCropPointerPressed" PointerMoved="OnCropPointerMoved" PointerReleased="OnCropPointerReleased" PointerWheelChanged="OnCropPointerWheelChanged" Cursor="Hand">
+            <Panel Width="240" Height="240">
+              <!-- Render Source Image translated and scaled -->
+              <Canvas Width="240" Height="240">
+                <Image Source="{Binding SourceBitmap}"
+                       Width="{Binding ImageNaturalWidth}"
+                       Height="{Binding ImageNaturalHeight}"
+                       RenderTransformOrigin="0%,0%">
+                  <Image.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
+                      <TranslateTransform X="{Binding OffsetX}" Y="{Binding OffsetY}" />
+                    </TransformGroup>
+                  </Image.RenderTransform>
+                </Image>
+              </Canvas>
+
+              <!-- Inner Crop Guide Frame Overlay -->
+              <Border Width="220" Height="220" CornerRadius="16" BorderBrush="#80FFFFFF" BorderThickness="1.5" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Panel>
+          </Border>
+
+          <!-- Zoom Slider -->
+          <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+            <PathIcon Grid.Column="0" Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,8,0" />
+            <Slider Grid.Column="1" Minimum="0.2" Maximum="5.0" Value="{Binding Zoom, Mode=TwoWay}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Text="{Binding Zoom, StringFormat='{}{0:F1}x'}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" FontWeight="Bold" Width="36" TextAlignment="Right" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+
+        <!-- RIGHT: Live Preview and Info -->
+        <StackPanel Grid.Column="1" Spacing="16" Margin="24,0,0,0" VerticalAlignment="Center">
+          <TextBlock Text="ПРЕДПРОСМОТР ИКОНКИ" Classes="heading" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+
+          <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+            <!-- Large Preview (80x80) -->
+            <Border Width="80" Height="80" CornerRadius="18" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" ClipToBounds="True">
+              <Image Source="{Binding PreviewBitmap}" Width="80" Height="80" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+            </Border>
+
+            <!-- Small Preview (44x44) -->
+            <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" ClipToBounds="True" VerticalAlignment="Bottom">
+              <Image Source="{Binding PreviewBitmap}" Width="44" Height="44" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+            </Border>
+          </StackPanel>
+
+          <TextBlock Text="Эта картинка будет отображаться на карточке сборки, в заголовке и на кнопке быстрого запуска." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+
+          <TextBlock Text="{Binding StatusMessage}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+
+      </Grid>
+
+      <!-- Footer Buttons -->
+      <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto">
+        <Button Grid.Column="0" Classes="btn-outline" Command="{Binding ResetCommand}" Padding="14,8">
+          <TextBlock Text="Сбросить" FontSize="11" />
+        </Button>
+
+        <Button Grid.Column="2" Classes="btn-outline" Command="{Binding CancelCommand}" Padding="16,8" Margin="0,0,8,0">
+          <TextBlock Text="Отмена" FontSize="11" />
+        </Button>
+
+        <Button Grid.Column="3" Classes="btn-primary" Command="{Binding SaveCropCommand}" Padding="20,8">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconCheck}" Width="12" Height="12" Foreground="#09090B" />
+            <TextBlock Text="Сохранить иконку" FontSize="11" FontWeight="Black" />
+          </StackPanel>
+        </Button>
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

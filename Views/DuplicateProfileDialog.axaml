@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
+             x:Class="ServantLauncher.Views.DuplicateProfileDialog"
+             x:DataType="vm:DuplicateProfileViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="28" Width="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Spacing="20">
+      
+      <!-- Header -->
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="4">
+          <TextBlock Text="КЛОНИРОВАНИЕ СБОРКИ" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Создать независимую копию выбранной сборки" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CancelCommand}" Padding="8,4" CornerRadius="12">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+        </Button>
+      </Grid>
+
+      <!-- New Name Input -->
+      <StackPanel Spacing="8">
+        <TextBlock Text="Название новой сборки" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+        <TextBox Text="{Binding NewName, Mode=TwoWay}" Watermark="Введите название сборки..." Height="40" />
+      </StackPanel>
+
+      <!-- Copy Options Checkboxes -->
+      <StackPanel Spacing="10">
+        <TextBlock Text="Что скопировать из оригинальной сборки:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+        
+        <Border Background="#161420" CornerRadius="14" Padding="14" BorderBrush="#20FFFFFF" BorderThickness="1">
+          <StackPanel Spacing="10">
+            <CheckBox IsChecked="{Binding CopyMods, Mode=TwoWay}" Content="Установленные моды (папка mods)" />
+            <CheckBox IsChecked="{Binding CopyConfigs, Mode=TwoWay}" Content="Конфигурации модов (папка config)" />
+            <CheckBox IsChecked="{Binding CopyShaderPacks, Mode=TwoWay}" Content="Шейдерпаки и ресурспаки (shaderpacks, resourcepacks)" />
+            <CheckBox IsChecked="{Binding CopyOptions, Mode=TwoWay}" Content="Настройки управления и графики (options.txt)" />
+            <CheckBox IsChecked="{Binding CopySaves, Mode=TwoWay}" Content="Одиночные миры и сохранения (папка saves)" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Action Buttons -->
+      <Grid ColumnDefinitions="*,*">
+        <Button Grid.Column="0" Classes="btn-outline" Command="{Binding CancelCommand}" Content="Отмена" Padding="18,10" Margin="0,0,8,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+        <Button Grid.Column="1" Classes="btn-primary" Command="{Binding DuplicateCommand}" Padding="18,10" Margin="8,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <PathIcon Data="{StaticResource IconDuplicate}" Width="14" Height="14" Foreground="#09090B" />
+            <TextBlock Text="Клонировать" FontWeight="Black" FontSize="12" />
+          </StackPanel>
+        </Button>
+      </Grid>
+
+    </StackPanel>
+  </Border>
+</UserControl>

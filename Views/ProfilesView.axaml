@@ -1,0 +1,258 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:views="using:ServantLauncher.Views"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ServantLauncher.Views.ProfilesView"
+             x:DataType="vm:ProfilesViewModel"
+             PointerMoved="OnRootPointerMoved"
+             PointerReleased="OnRootPointerReleased"
+             PointerCaptureLost="OnRootPointerCaptureLost">
+
+  <UserControl.Styles>
+    <Style Selector="Border.card-dragging">
+      <Setter Property="Opacity" Value="0.25" />
+      <Setter Property="RenderTransform" Value="scale(0.96)" />
+      <Setter Property="BorderBrush" Value="#80A78BFA" />
+      <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid>
+    <!-- View 1: Main Profiles Grid View (Rounded rectangular cards slightly wider than square) -->
+    <ScrollViewer IsVisible="{Binding !IsViewingDetails}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="22" Margin="28">
+        
+        <!-- Header & Action Buttons -->
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Text="ВАШИ СБОРКИ MINECRAFT" Classes="heading" FontSize="22" FontWeight="Black" Foreground="White" />
+            <TextBlock Text="Выберите сборку для игры или настройте моды и параметры запуска." FontSize="13" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Button Classes="btn-outline" Command="{Binding OpenModrinthCatalogCommand}" Padding="18,10" ToolTip.Tip="Каталог готовых сборок на Modrinth">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconGlobe}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="СБОРКИ С MODRINTH" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+            <Button Classes="btn-outline" Click="OnImportMrpackClicked" Padding="18,10" ToolTip.Tip="Импортировать модпак в формате .mrpack">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconDownload}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="ИМПОРТ .MRPACK" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+            <Button Classes="btn-primary" Command="{Binding OpenCreateDialogCommand}" Padding="22,10">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="{StaticResource IconPlus}" Width="14" Height="14" Foreground="#09090B" />
+                <TextBlock Text="СОЗДАТЬ СБОРКУ" FontSize="12" FontWeight="Black" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+
+        <!-- EMPTY STATE (When no profiles exist) -->
+        <Border Classes="glass-card" Padding="40" CornerRadius="24" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0" IsVisible="{Binding HasNoProfiles}" MaxWidth="560">
+          <StackPanel Spacing="16" HorizontalAlignment="Center">
+            <Border Width="64" Height="64" CornerRadius="20" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" HorizontalAlignment="Center">
+              <PathIcon Data="{StaticResource IconBoxes}" Width="30" Height="30" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            
+            <TextBlock Text="НЕТ СОЗДАННЫХ СБОРОК" Classes="heading" FontSize="18" FontWeight="Black" Foreground="White" TextAlignment="Center" />
+            <TextBlock Text="Создайте новую чистую сборку с любой версией Minecraft (Vanilla / Fabric) или импортируйте готовый модпак Modrinth (.mrpack)." FontSize="13" Foreground="{DynamicResource TextMutedBrush}" TextAlignment="Center" TextWrapping="Wrap" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,10,0,0">
+              <Button Classes="btn-outline" Command="{Binding OpenModrinthCatalogCommand}" Padding="18,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconGlobe}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Text="Сборки с Modrinth" FontSize="12" FontWeight="Bold" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-outline" Click="OnImportMrpackClicked" Padding="18,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconDownload}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Text="Импорт .mrpack" FontSize="12" FontWeight="Bold" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-primary" Command="{Binding OpenCreateDialogCommand}" Padding="22,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Data="{StaticResource IconPlus}" Width="14" Height="14" Foreground="#09090B" />
+                  <TextBlock Text="Создать сборку" FontSize="12" FontWeight="Black" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Profiles Rectangular Cards Grid (WrapPanel) -->
+        <ItemsControl ItemsSource="{Binding ProfileCards}" IsVisible="{Binding !HasNoProfiles}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Classes="glass-card" Classes.card-dragging="{Binding IsDragging}" Width="185" Height="285" Margin="0,0,16,16" CornerRadius="18" Padding="10" ClipToBounds="True">
+                <Grid RowDefinitions="Auto,*,Auto">
+
+                  <!-- 1. BIG PICTURE CONTAINER (Top) -->
+                  <Panel Grid.Row="0" Width="165" Height="150">
+                    <Border CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="#20FFFFFF" BorderThickness="1" ClipToBounds="True" Width="165" Height="150">
+                      <!-- Clickable to open profile details -->
+                      <Button Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).OpenProfileDetailsCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0">
+                        <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                          <!-- Custom Icon Image if present -->
+                          <Image Source="{Binding Profile.IconBitmap}" IsVisible="{Binding Profile.HasCustomIcon}" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          
+                          <!-- Clean Geometric Cube / Default Icon Placeholder -->
+                          <Border Background="{DynamicResource CardBgBrush}" IsVisible="{Binding !Profile.HasCustomIcon}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <PathIcon Data="{Binding IconGeometry}" Width="48" Height="48" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Border>
+
+                          <!-- Top-Left Loader or Official Server Badge -->
+                          <Border Background="{DynamicResource BrandPrimaryBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" IsVisible="{Binding IsServerProfile}">
+                            <TextBlock Text="СЕРВЕР" FontSize="9" FontWeight="Black" Foreground="White" />
+                          </Border>
+                          <Border Background="{DynamicResource HeaderBgBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" IsVisible="{Binding !IsServerProfile}">
+                            <TextBlock Text="{Binding Profile.LoaderType}" FontSize="10" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" />
+                          </Border>
+                        </Panel>
+                      </Button>
+                    </Border>
+
+                    <!-- Circular Floating Play / Action Button (Bottom-Right overlay of image) -->
+                    <Panel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,8">
+                      <!-- Normal Play / Install Button -->
+                      <Button Classes="btn-primary" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).PlayProfileCommand}" CommandParameter="{Binding}" Width="38" Height="38" CornerRadius="19" Padding="0" ToolTip.Tip="{Binding PlayButtonText}" IsVisible="{Binding !IsDangerButton}">
+                        <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                          <PathIcon Data="{StaticResource IconPlay}" Width="14" Height="14" Foreground="White" IsVisible="{Binding IsInstalled}" Margin="2,0,0,0" />
+                          <PathIcon Data="{StaticResource IconDownload}" Width="14" Height="14" Foreground="White" IsVisible="{Binding !IsInstalled}" />
+                        </Panel>
+                      </Button>
+
+                      <!-- Danger Stop Button -->
+                      <Button Classes="btn-danger" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).PlayProfileCommand}" CommandParameter="{Binding}" Width="38" Height="38" CornerRadius="19" Padding="0" ToolTip.Tip="{Binding PlayButtonText}" IsVisible="{Binding IsDangerButton}">
+                        <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Button>
+                    </Panel>
+                  </Panel>
+
+                  <!-- 2. TITLE & SUBTITLE SECTION (Under the picture) -->
+                  <Button Grid.Row="1" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).OpenProfileDetailsCommand}" CommandParameter="{Binding}" Padding="4,6,4,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left">
+                    <StackPanel Spacing="3">
+                      <TextBlock Text="{Binding Profile.Name}" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" MaxLines="1" />
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{Binding Profile.GameVersion}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBlock Text="{Binding LastPlayedText}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+
+                      <!-- Play Time Counter -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,1,0,0">
+                        <PathIcon Data="{StaticResource IconClock}" Width="10" Height="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding PlayTimeText, StringFormat='Наиграно: {0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" />
+                      </StackPanel>
+
+                      <!-- Mini Progress Bar during launch -->
+                      <ProgressBar Value="{Binding LaunchProgressPercent}" Minimum="0" Maximum="100" Height="3" CornerRadius="2" Foreground="{DynamicResource BrandAccentBrush}" Background="#22FFFFFF" IsVisible="{Binding ShowProgressBar}" Margin="0,3,0,0" />
+                    </StackPanel>
+                  </Button>
+
+                  <!-- 3. ACTIONS ROW (Bottom: Drag Handle, Settings, Duplicate, Delete) -->
+                  <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,4,0,0">
+                    <Border Grid.Column="0" Background="Transparent" Padding="5,3" CornerRadius="6" Cursor="SizeAll" ToolTip.Tip="Зажмите и перетащите для изменения порядка сборок" PointerPressed="OnProfileDragPointerPressed">
+                      <PathIcon Data="{StaticResource IconGripVertical}" Width="10" Height="10" Foreground="{DynamicResource TextMutedBrush}" />
+                    </Border>
+
+                    <Button Grid.Column="2" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).OpenProfileDetailsCommand}" CommandParameter="{Binding}" ToolTip.Tip="Настроить сборку" Padding="4,3" CornerRadius="6">
+                      <PathIcon Data="{StaticResource IconSettings}" Width="12" Height="12" Foreground="{DynamicResource TextBrightBrush}" />
+                    </Button>
+                    <Button Grid.Column="3" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).DuplicateProfileCommand}" CommandParameter="{Binding}" ToolTip.Tip="Клонировать сборку" Padding="4,3" CornerRadius="6">
+                      <PathIcon Data="{StaticResource IconDuplicate}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                    </Button>
+                    <Button Grid.Column="4" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).RequestDeleteProfileCommand}" CommandParameter="{Binding}" ToolTip.Tip="Удалить сборку" Padding="4,3" CornerRadius="6" IsVisible="{Binding CanDelete}">
+                      <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="#F87171" />
+                    </Button>
+                  </Grid>
+
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- View 2: Profile Details Page (For THIS Profile) -->
+    <views:ProfileDetailsView DataContext="{Binding ActiveDetailsVm}" IsVisible="{Binding $parent[UserControl].((vm:ProfilesViewModel)DataContext).IsViewingDetails}" />
+
+    <!-- Modal Dialog Overlay for Creating Profile -->
+    <Border Background="#B0000000" IsVisible="{Binding IsCreateDialogOpen}">
+      <views:CreateProfileDialog DataContext="{Binding CreateDialogVm}" />
+    </Border>
+
+    <!-- Modal Dialog Overlay for Duplicating Profile -->
+    <Border Background="#B0000000" IsVisible="{Binding IsDuplicateDialogOpen}">
+      <views:DuplicateProfileDialog DataContext="{Binding DuplicateDialogVm}" />
+    </Border>
+
+    <!-- Modal Dialog Overlay for Deleting Profile With Checkbox Confirmation -->
+    <Border Background="#C0000000" IsVisible="{Binding IsDeleteDialogOpen}">
+      <views:DeleteProfileDialog DataContext="{Binding DeleteDialogVm}" />
+    </Border>
+
+    <!-- DRAG OVERLAY CANVAS FOR FLOATING DETACHED PROFILE CARD -->
+    <Canvas x:Name="DragOverlayCanvas" IsHitTestVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="99999">
+      <Border x:Name="FloatingProfileCard"
+              IsVisible="False"
+              Width="185" Height="285"
+              CornerRadius="18"
+              Padding="10"
+              Classes="glass-card"
+              Background="#28203C"
+              BorderBrush="{DynamicResource BrandAccentBrush}"
+              BorderThickness="2"
+              BoxShadow="0 20 45 0 #B0000000"
+              Opacity="0.95">
+        <Border.RenderTransform>
+          <TransformGroup>
+            <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
+            <RotateTransform Angle="2.5" />
+          </TransformGroup>
+        </Border.RenderTransform>
+        <Grid RowDefinitions="Auto,*,Auto">
+          <Border Grid.Row="0" CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="#30FFFFFF" BorderThickness="1" ClipToBounds="True" Width="165" Height="150">
+            <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Image x:Name="FloatingProfileIcon" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <Border x:Name="FloatingProfileDefaultIconBorder" Background="{DynamicResource CardBgBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <PathIcon x:Name="FloatingProfileDefaultIcon" Width="48" Height="48" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <Border x:Name="FloatingProfileBadge" Background="{DynamicResource HeaderBgBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                <TextBlock x:Name="FloatingProfileLoader" FontSize="10" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" />
+              </Border>
+            </Panel>
+          </Border>
+
+          <StackPanel Grid.Row="1" Spacing="3" Margin="4,6,4,2">
+            <TextBlock x:Name="FloatingProfileName" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" MaxLines="1" />
+            <TextBlock x:Name="FloatingProfileVersion" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+          </StackPanel>
+
+          <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,4,0,0">
+            <PathIcon Data="{StaticResource IconGripVertical}" Width="11" Height="11" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Перемещение сборки..." FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" Margin="6,0,0,0" />
+          </Grid>
+        </Grid>
+      </Border>
+    </Canvas>
+  </Grid>
+</UserControl>

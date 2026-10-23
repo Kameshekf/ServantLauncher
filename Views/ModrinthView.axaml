@@ -1,0 +1,339 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:views="using:ServantLauncher.Views"
+             xmlns:m="using:ServantLauncher.Models"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ServantLauncher.Views.ModrinthView"
+             x:DataType="vm:ModrinthViewModel">
+
+  <Grid>
+    <Grid RowDefinitions="Auto,*">
+      
+      <!-- Top Bar: Search, Category Filters, Tab switcher -->
+      <StackPanel Grid.Row="0" Spacing="14" Margin="24,18,24,12">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <!-- Back button when in modpack catalog mode -->
+          <Button Grid.Column="0" Classes="btn-outline" Command="{Binding BackCommand}" Padding="12,7" Margin="0,0,16,0" VerticalAlignment="Center" IsVisible="{Binding IsModpackCatalogMode}" ToolTip.Tip="Назад к сборкам">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconChevronLeft}" Width="12" Height="12" Foreground="White" VerticalAlignment="Center" />
+              <TextBlock Text="К сборкам" FontSize="11" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+
+          <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+            <TextBlock Text="{Binding HeaderTitle}" Classes="heading" FontSize="22" FontWeight="Black" Foreground="White" />
+            <TextBlock Text="{Binding HeaderSubtitle}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+
+          <!-- Catalog vs Installed Switcher (Only visible in normal mods mode, hidden in modpack catalog) -->
+          <Border Grid.Column="2" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="18" Padding="4" BorderBrush="#20FFFFFF" BorderThickness="1" IsVisible="{Binding !IsModpackCatalogMode}">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <RadioButton Content="Каталог Modrinth" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}" Click="OnCatalogTabClicked" FontSize="11" Padding="14,6" />
+              <RadioButton Content="Установленные моды" Classes="nav-pill" IsChecked="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}" Click="OnInstalledTabClicked" FontSize="11" Padding="14,6" />
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <!-- Live Search Box & Categories (No button, instant debounced search) -->
+        <StackPanel Spacing="10" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+          <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="{Binding SearchWatermark}" Height="42">
+            <TextBox.InnerLeftContent>
+              <PathIcon Data="{StaticResource IconSearch}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" Margin="12,0,4,0" />
+            </TextBox.InnerLeftContent>
+          </TextBox>
+
+          <!-- Categories horizontal pills -->
+          <ItemsControl ItemsSource="{Binding Categories}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Classes="btn-outline" Content="{Binding}" Command="{Binding $parent[UserControl].((vm:ModrinthViewModel)DataContext).SelectCategoryCommand}" CommandParameter="{Binding}" Padding="14,6" FontSize="11" CornerRadius="16" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </StackPanel>
+
+      <!-- Content: Tab 0 (Modrinth Catalog) -->
+      <Grid Grid.Row="1" RowDefinitions="*,Auto" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+        <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding SearchResults}" Margin="24,4,24,12">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Classes="glass-card" Margin="0,0,0,10" Padding="16">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    
+                    <!-- Mod Icon -->
+                    <Border Grid.Column="0" Width="52" Height="52" CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" Margin="0,0,16,0" ClipToBounds="True">
+                      <Panel>
+                        <Image Source="{Binding IconBitmap}" IsVisible="{Binding HasIconBitmap}" Width="52" Height="52" Stretch="UniformToFill" />
+                        <PathIcon Data="{StaticResource IconPuzzle}" Width="22" Height="22" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasIconBitmap}" />
+                      </Panel>
+                    </Border>
+
+                    <!-- Info -->
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding Title}" Classes="heading" FontSize="15" FontWeight="Bold" Foreground="White" />
+                        <Border Background="{DynamicResource BrandAccentAlphaBrush}" BorderBrush="{DynamicResource BrandAccentBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="6,2" IsVisible="{Binding IsModpack}">
+                          <TextBlock Text="СБОРКА" FontSize="10" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" />
+                        </Border>
+                        <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="6,2">
+                          <TextBlock Text="{Binding Author, StringFormat='от {0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                        </Border>
+                        <Border Background="#1E1C28" CornerRadius="6" Padding="6,2">
+                          <StackPanel Orientation="Horizontal" Spacing="4">
+                            <PathIcon Data="{StaticResource IconDownload}" Width="9" Height="9" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding FormattedDownloads}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                          </StackPanel>
+                        </Border>
+                      </StackPanel>
+
+                      <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" MaxLines="2" />
+                      <TextBlock Text="{Binding DisplayCategories}" FontSize="10" Foreground="{DynamicResource BrandAccentBrush}" />
+                    </StackPanel>
+
+                    <!-- Actions -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                      <Button Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ModrinthViewModel)DataContext).OpenModDetailsCommand}" CommandParameter="{Binding}" Content="Подробнее" Padding="14,8" />
+                      <Button Classes="btn-primary" Command="{Binding $parent[UserControl].((vm:ModrinthViewModel)DataContext).InstallSelectedModCommand}" CommandParameter="{Binding}" Padding="16,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="#09090B" />
+                          <TextBlock Text="Установить сборку" FontSize="11" FontWeight="Bold" Foreground="#09090B" IsVisible="{Binding IsModpack}" />
+                          <TextBlock Text="Установить" FontSize="11" FontWeight="Bold" Foreground="#09090B" IsVisible="{Binding !IsModpack}" />
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Pagination Bar -->
+        <Border Grid.Row="1" Margin="24,4,24,14" HorizontalAlignment="Center" IsVisible="{Binding HasMultiplePages}">
+          <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <Button Classes="btn-outline" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPrevPage}" Padding="12,6" CornerRadius="10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconChevronLeft}" Width="12" Height="12" Foreground="White" />
+                <TextBlock Text="Назад" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+              </StackPanel>
+            </Button>
+
+            <Border Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" CornerRadius="10" Padding="14,6">
+              <TextBlock Text="{Binding PaginationInfo}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+            </Border>
+
+            <Button Classes="btn-outline" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNextPage}" Padding="12,6" CornerRadius="10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Вперед" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                <PathIcon Data="{StaticResource IconChevronRight}" Width="12" Height="12" Foreground="White" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Content: Tab 1 (Installed Mods) -->
+      <Grid Grid.Row="1" IsVisible="{Binding SelectedTabIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}" Margin="24,4,24,24" DragDrop.AllowDrop="True">
+        <Grid RowDefinitions="Auto,*">
+          
+          <!-- Header actions -->
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <TextBlock Grid.Column="0" Text="Моды в активной сборке" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="btn-outline" Command="{Binding OpenModsFolderCommand}" Padding="14,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="Открыть папку mods" />
+              </StackPanel>
+            </Button>
+          </Grid>
+
+          <!-- List -->
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding InstalledMods}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes="glass-card" Margin="0,0,0,8" Padding="14">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Foreground="White" FontSize="13" />
+                        <TextBlock Text="{Binding DisplaySize}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+
+                      <!-- Status Tag -->
+                      <Border Grid.Column="1" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="8" Padding="8,3" Margin="12,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding IsEnabled, Converter={StaticResource BoolToStatusTextConverter}}" Foreground="{Binding IsEnabled, Converter={StaticResource BoolToColorConverter}}" FontSize="10" FontWeight="Bold" />
+                      </Border>
+
+                      <Button Grid.Column="2" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ModrinthViewModel)DataContext).ToggleModCommand}" CommandParameter="{Binding}" Content="Вкл/Выкл" Padding="12,6" Margin="0,0,8,0" VerticalAlignment="Center" />
+                      <Button Grid.Column="3" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:ModrinthViewModel)DataContext).DeleteModCommand}" CommandParameter="{Binding}" ToolTip.Tip="Удалить мод" Padding="10,6" VerticalAlignment="Center">
+                        <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                      </Button>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+
+        </Grid>
+      </Grid>
+
+    </Grid>
+
+    <!-- MOD DETAILS MODAL OVERLAY -->
+    <Border Background="#B0000000" IsVisible="{Binding IsModDetailsOpen}">
+      <views:ModDetailsDialog DataContext="{Binding ActiveModDetailsVm}" />
+    </Border>
+
+    <!-- MODPACK VERSION SELECTION MODAL OVERLAY -->
+    <Border Background="#B0000000" IsVisible="{Binding IsModpackVersionDialogOpen}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="26" Width="560" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid RowDefinitions="Auto,*,Auto">
+          
+          <!-- Header Area -->
+          <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,16">
+            <!-- Icon -->
+            <Border Grid.Column="0" Width="52" Height="52" CornerRadius="14" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" Margin="0,0,14,0" ClipToBounds="True">
+              <Panel>
+                <Image Source="{Binding SelectedModpackForInstall.IconBitmap}" IsVisible="{Binding SelectedModpackForInstall.HasIconBitmap}" Width="52" Height="52" Stretch="UniformToFill" />
+                <PathIcon Data="{StaticResource IconBoxes}" Width="22" Height="22" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !SelectedModpackForInstall.HasIconBitmap}" />
+              </Panel>
+            </Border>
+
+            <!-- Title & Subtitle -->
+            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="{Binding SelectedModpackForInstall.Title}" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" TextTrimming="CharacterEllipsis" MaxWidth="380" />
+                <Border Background="{DynamicResource BrandAccentAlphaBrush}" BorderBrush="{DynamicResource BrandAccentBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="6,2" VerticalAlignment="Center">
+                  <TextBlock Text="СБОРКА" FontSize="10" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" />
+                </Border>
+              </StackPanel>
+              <TextBlock Text="{Binding SelectedModpackForInstall.Author, StringFormat='Автор: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+
+            <!-- Close Button -->
+            <Button Grid.Column="2" Classes="btn-outline" Command="{Binding CloseModpackVersionDialogCommand}" IsEnabled="{Binding !IsInstallingModpack}" Width="32" Height="32" Padding="0" CornerRadius="16" VerticalAlignment="Top">
+              <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+          </Grid>
+
+          <!-- Main Options -->
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,0,0,16">
+            <StackPanel Spacing="16">
+              
+              <!-- Loading Indicator -->
+              <StackPanel Spacing="10" HorizontalAlignment="Center" Margin="0,20" IsVisible="{Binding IsLoadingModpackVersions}">
+                <ProgressBar IsIndeterminate="True" Width="180" Height="4" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="Загрузка доступных версий сборки..." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+              </StackPanel>
+
+              <StackPanel Spacing="16" IsVisible="{Binding !IsLoadingModpackVersions}">
+                <!-- 1. Minecraft Version Selection -->
+                <StackPanel Spacing="8">
+                  <TextBlock Text="ВЕРСИЯ ИГРЫ (MINECRAFT)" Classes="heading" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <ComboBox ItemsSource="{Binding AvailableMinecraftVersions}" SelectedItem="{Binding SelectedMinecraftVersion}" HorizontalAlignment="Stretch" Height="40" CornerRadius="10">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <PathIcon Data="{StaticResource IconBoxes}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                          <TextBlock Text="{Binding StringFormat='Minecraft {0}'}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+
+                <!-- 2. Modpack Release Version Selection -->
+                <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="ВЕРСИЯ СБОРКИ" Classes="heading" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding FilteredModpackReleases.Count, StringFormat='Найдено релизов: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                  </Grid>
+
+                  <ComboBox ItemsSource="{Binding FilteredModpackReleases}" SelectedItem="{Binding SelectedModpackRelease}" HorizontalAlignment="Stretch" Height="44" CornerRadius="10">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate x:DataType="m:ModrinthVersion">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                          <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="12" />
+                            <TextBlock Text="{Binding VersionNumber, StringFormat='Версия: {0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                          </StackPanel>
+
+                          <Border Grid.Column="1" Background="#1E1C28" CornerRadius="6" Padding="6,2" Margin="8,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayLoaders}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource PillActiveBgBrush}" />
+                          </Border>
+
+                          <Border Grid.Column="2" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="6,2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding VersionType}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                          </Border>
+                        </Grid>
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+
+                <!-- Selected Release Summary Details -->
+                <Border Classes="glass-card" Background="#15141E" CornerRadius="12" Padding="14" IsVisible="{Binding SelectedModpackRelease, Converter={x:Static ObjectConverters.IsNotNull}}">
+                  <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Grid.Column="0" Text="{Binding SelectedModpackRelease.Name}" FontWeight="Bold" FontSize="13" Foreground="White" />
+                      <TextBlock Grid.Column="1" Text="{Binding SelectedModpackRelease.FormattedDate}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                      <TextBlock Text="{Binding SelectedModpackRelease.DisplayLoaders, StringFormat='Загрузчик: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Text="{Binding SelectedModpackRelease.DisplayGameVersions, StringFormat='Minecraft: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+
+                <!-- Installing progress state -->
+                <StackPanel Spacing="8" IsVisible="{Binding IsInstallingModpack}">
+                  <ProgressBar IsIndeterminate="True" Height="4" Foreground="{DynamicResource BrandAccentBrush}" />
+                  <TextBlock Text="{Binding ModpackVersionDialogStatus}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Text="{Binding ModpackVersionDialogStatus}" FontSize="11" Foreground="#EF4444" IsVisible="{Binding !IsInstallingModpack}" HorizontalAlignment="Center" />
+              </StackPanel>
+
+            </StackPanel>
+          </ScrollViewer>
+
+          <!-- Actions -->
+          <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
+            <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CloseModpackVersionDialogCommand}" IsEnabled="{Binding !IsInstallingModpack}" Content="Отмена" Padding="18,9" CornerRadius="10" Margin="0,0,10,0" />
+            <Button Grid.Column="2" Classes="btn-primary" Command="{Binding ConfirmInstallModpackCommand}" IsEnabled="{Binding !IsInstallingModpack}" Padding="20,9" CornerRadius="10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconDownload}" Width="13" Height="13" Foreground="#09090B" />
+                <TextBlock Text="Установить сборку" FontSize="12" FontWeight="Bold" Foreground="#09090B" />
+              </StackPanel>
+            </Button>
+          </Grid>
+
+        </Grid>
+      </Border>
+    </Border>
+
+    <!-- LOADING / SEARCHING OVERLAY -->
+    <Border Background="#90000000" IsVisible="{Binding IsSearching}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <Border Classes="glass-card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28,20" CornerRadius="18">
+        <StackPanel Spacing="12" HorizontalAlignment="Center">
+          <ProgressBar IsIndeterminate="True" Width="180" Height="4" Foreground="{DynamicResource BrandAccentBrush}" />
+          <TextBlock Text="Поиск на Modrinth..." FontSize="12" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+    </Border>
+
+  </Grid>
+</UserControl>

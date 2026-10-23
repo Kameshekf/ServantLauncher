@@ -1,0 +1,812 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:controls="using:ServantLauncher.Controls"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
+             x:Class="ServantLauncher.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="1.5" CornerRadius="20" Padding="0" Width="880" Height="630" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*">
+      
+      <!-- Top Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="24,18,24,14">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="НАСТРОЙКИ СИСТЕМЫ" Classes="heading" FontSize="18" FontWeight="Black" Foreground="White" LetterSpacing="0.5" />
+          <TextBlock Text="Персонализация интерфейса, тем, производительности и автоматизации." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CloseDialogCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <Separator Grid.Row="0" VerticalAlignment="Bottom" Height="1" Background="#1FFFFFFF" />
+
+      <!-- Main Content: Left Nav Rail + Right Panel -->
+      <Grid Grid.Row="1" ColumnDefinitions="210,1,*">
+        
+        <!-- Left Navigation Rail -->
+        <Border Grid.Column="0" Background="#14000000" Padding="12,14">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="4">
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconSettings}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Общие" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconPalette}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Оформление и темы" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconImage}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Задний фон" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconCoffee}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Java" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="4" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconMonitor}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Параметры игры" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconZap}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Автоматизация" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconPlug}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Плагины" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconMessageSquare}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Discord RPC" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="9" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconCpu}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="Оптимизация" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+
+              <Button Classes="btn-ghost" Command="{Binding SelectCategoryCommand}" CommandParameter="8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,10" CornerRadius="10">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <PathIcon Data="{StaticResource IconInfo}" Width="14" Height="14" Foreground="{DynamicResource TextBrightBrush}" />
+                  <TextBlock Text="О лаунчере" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+
+        <!-- Vertical Separator -->
+        <Rectangle Grid.Column="1" Width="1" Fill="#1AFFFFFF" />
+
+        <!-- Right Content Area -->
+        <Border Grid.Column="2" Padding="20,16">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Panel>
+              
+              <!-- TAB 0: ОБЩИЕ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Основные параметры" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Настройки поведения лаунчера:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <CheckBox IsChecked="{Binding OpenConsoleOnLaunch, Mode=TwoWay}" Content="Автоматически открывать вкладку 'Консоль' при запуске игры" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                  </StackPanel>
+                </Border>
+
+                <!-- БЛОК: ОБНОВЛЕНИЯ -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Обновления лаунчера и сборки" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Быстрая проверка актуальности компонентов без перезапуска:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                    </Grid>
+
+                    <!-- Launcher Update Row -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                      <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <TextBlock Text="Лаунчер:" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                          <TextBlock Text="{Binding LauncherCurrentVersion}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding LauncherUpdateStatus}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CheckLauncherUpdateCommand}" IsEnabled="{Binding !IsCheckingLauncherUpdate}" Padding="12,6">
+                        <TextBlock Text="Проверить лаунчер" FontSize="11" FontWeight="SemiBold" />
+                      </Button>
+                    </Grid>
+
+                    <Separator Height="1" Background="#1AFFFFFF" Margin="0,2" />
+
+                    <!-- Server Pack Update Row -->
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <TextBlock Text="Сборка сервера:" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                          <TextBlock Text="{Binding ServerPackCurrentVersion, StringFormat='v{0}'}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding ServerPackUpdateStatus}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CheckServerPackUpdateCommand}" IsEnabled="{Binding !IsCheckingServerPackUpdate}" Padding="12,6">
+                        <TextBlock Text="Проверить сборку" FontSize="11" FontWeight="SemiBold" />
+                      </Button>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 1: ОФОРМЛЕНИЕ И ТЕМЫ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}">
+                
+                <!-- LIVE PREVIEW BLOCK -->
+                <Border Classes="glass-card" Padding="16" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="1.5">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="ЖИВОЙ ПРЕДПРОСМОТР СТИЛЕЙ" Classes="heading" FontSize="13" FontWeight="Black" Foreground="White" />
+                        <TextBlock Text="Все кнопки и карточки обновляются моментально при настройке цветов:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Background="{DynamicResource BrandPrimaryBrush}" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
+                        <TextBlock Text="PREVIEW" FontSize="10" FontWeight="Black" Foreground="White" />
+                      </Border>
+                    </Grid>
+
+                    <!-- Interactive Button Sample Row -->
+                    <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                      <Button Classes="btn-primary" Margin="0,0,8,8" Content="Primary Кнопка" />
+                      <Button Classes="btn-purple" Margin="0,0,8,8" Content="Purple Кнопка" />
+                      <Button Classes="btn-outline" Margin="0,0,8,8" Content="Outline Кнопка" />
+                      <Button Classes="btn-danger" Margin="0,0,8,8" Content="Danger Кнопка" />
+                    </WrapPanel>
+
+                    <Border Background="#14000000" CornerRadius="10" Padding="12,8" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                          <TextBlock Text="Стеклянная карточка интерфейса" FontWeight="Bold" FontSize="11" Foreground="White" />
+                          <TextBlock Text="Прозрачность карточек зависит от ползунка Glassmorphism ниже" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="Акцентный текст" Foreground="{DynamicResource BrandAccentBrush}" FontWeight="Bold" FontSize="11" VerticalAlignment="Center" />
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+                </Border>
+
+                <!-- PRESETS -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Готовые темы оформления" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Быстрое переключение палитры интерфейса в один клик:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <WrapPanel Orientation="Horizontal">
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="ServantPurple" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#9D4EDD" />
+                          <TextBlock Text="Фиолетовая" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="CyberpunkNeon" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#00F5D4" />
+                          <TextBlock Text="Бирюзовый неон" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="EmeraldGrove" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#06D6A0" />
+                          <TextBlock Text="Изумрудная (Зелёная)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="CrimsonFlame" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#EF233C" />
+                          <TextBlock Text="Алая (Красная)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="GoldenSun" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#FFB703" />
+                          <TextBlock Text="Янтарная (Золотая)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Classes="btn-outline" Command="{Binding ApplyPresetCommand}" CommandParameter="MidnightOled" Margin="0,0,8,8" Padding="12,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <Border Width="12" Height="12" CornerRadius="6" Background="#3A86FF" />
+                          <TextBlock Text="Глубокий чёрный (OLED)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                    </WrapPanel>
+                  </StackPanel>
+                </Border>
+
+                <!-- INTERACTIVE HEX COLOR PICKER -->
+                <Border Classes="glass-card" Padding="18">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="ИНТЕРАКТИВНАЯ НАСТРОЙКА ЦВЕТОВ И КНОПОК" Classes="heading" FontSize="13" FontWeight="Black" Foreground="White" />
+                        <TextBlock Text="Выберите элемент интерфейса и настройте его оттенок на палитре:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                    </Grid>
+
+                    <!-- Element Selector ComboBox -->
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Настраиваемый элемент:" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextBrightBrush}" />
+                      <ComboBox SelectedIndex="{Binding SelectedColorTargetIndex, Mode=TwoWay}" HorizontalAlignment="Stretch" Height="36">
+                        <ComboBoxItem Content="1. Основная кнопка (btn-primary — Играть, Создать)" />
+                        <ComboBoxItem Content="2. Вторичная кнопка (btn-purple — Добавить скин, Моды)" />
+                        <ComboBoxItem Content="3. Контурная кнопка (btn-outline — Настройки, Папки)" />
+                        <ComboBoxItem Content="4. Кнопка отмены/закрытия (btn-danger — Отмена, Закрыть)" />
+                        <ComboBoxItem Content="5. Акцентные детали (Accent — Текст, бейджи, фокус)" />
+                        <ComboBoxItem Content="6. Фоновые карточки (Card Background)" />
+                        <ComboBoxItem Content="7. Общий фон лаунчера (Window Background)" />
+                        <ComboBoxItem Content="8. Шапка и навигация (Header &amp; Nav Background)" />
+                        <ComboBoxItem Content="9. Рамки карточек при наведении (Card Hover Border)" />
+                      </ComboBox>
+                    </StackPanel>
+
+                    <!-- Modern Hex Color Picker Control -->
+                    <controls:HexColorPickerControl SelectedHex="{Binding CurrentTargetColorHex, Mode=TwoWay}" Margin="0,4,0,0" />
+
+                    <!-- Glass Opacity -->
+                    <Border Background="#10FFFFFF" CornerRadius="10" Padding="12">
+                      <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Прозрачность карточек (Glassmorphism)" FontWeight="Bold" FontSize="12" Foreground="White" />
+                            <TextBlock Text="Регулирует степень прозрачности стеклянных панелей:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                          </StackPanel>
+                          <NumericUpDown Grid.Column="1" Minimum="30" Maximum="100" Value="{Binding GlassOpacityPercent, Mode=TwoWay}" FormatString="{}{0}%" Width="90" Height="32" Padding="6,2" VerticalAlignment="Center" />
+                        </Grid>
+                        <Slider Minimum="30" Maximum="100" Value="{Binding GlassOpacityPercent, Mode=TwoWay}" />
+                      </StackPanel>
+                    </Border>
+
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 2: ЗАДНИЙ ФОН -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}">
+                
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Режим фонового оформления" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Выберите тип фонового оформления главного окна лаунчера:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <ComboBox SelectedIndex="{Binding SelectedBackgroundModeIndex, Mode=TwoWay}" HorizontalAlignment="Stretch" Height="36">
+                      <ComboBoxItem Content="Скриншоты с сервера" />
+                      <ComboBoxItem Content="Пользовательское слайдшоу (свои фото)" />
+                      <ComboBoxItem Content="Одиночное изображение или GIF анимация" />
+                      <ComboBoxItem Content="Без фона (чистый цвет темы)" />
+                    </ComboBox>
+                  </StackPanel>
+                </Border>
+
+                <!-- Mode 0: Server Screenshots -->
+                <Border Classes="glass-card" Padding="16" IsVisible="{Binding IsModeDefaultScreenshots}">
+                  <StackPanel Spacing="10">
+                    <TextBlock Text="Скриншоты с сервера" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Лаунчер автоматически чередует скриншоты игроков и сервера из выделенной папки:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                    
+                    <Border Background="{DynamicResource BtnOutlineBgBrush}" CornerRadius="10" Padding="12" BorderBrush="#20FFFFFF" BorderThickness="1">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+                          <TextBlock Text="Папка для загрузки скриншотов сервера:" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <SelectableTextBlock Text="{Binding ServerScreenshotsPath}" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding OpenServerScreenshotsFolderCommand}" Padding="12,8" VerticalAlignment="Center" Margin="10,0,0,0">
+                          <StackPanel Orientation="Horizontal" Spacing="6">
+                            <PathIcon Data="{StaticResource IconFolderOpen}" Width="13" Height="13" Foreground="{DynamicResource TextBrightBrush}" />
+                            <TextBlock Text="Открыть папку" FontSize="11" FontWeight="Bold" />
+                          </StackPanel>
+                        </Button>
+                      </Grid>
+                    </Border>
+                  </StackPanel>
+                </Border>
+
+                <!-- Mode 1: Custom Slideshow -->
+                <Border Classes="glass-card" Padding="16" IsVisible="{Binding IsModeCustomSlideshow}">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Изображения слайдшоу" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Загрузите ваши скриншоты и упорядочьте их:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="btn-primary" Click="OnAddSlideshowImagesClicked" Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconPlus}" Width="11" Height="11" Foreground="#09090B" />
+                          <TextBlock Text="Добавить фото..." FontSize="11" FontWeight="Bold" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding Theme.SlideshowImages}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Background="#1AFFFFFF" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                              <TextBlock Grid.Column="0" Text="{Binding}" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                              <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).MoveSlideshowImageUpCommand}" CommandParameter="{Binding}" Padding="6,4" Margin="4,0" ToolTip.Tip="Переместить выше">
+                                <PathIcon Data="{StaticResource IconChevronUp}" Width="10" Height="10" Foreground="{DynamicResource TextMutedBrush}" />
+                              </Button>
+                              <Button Grid.Column="2" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).MoveSlideshowImageDownCommand}" CommandParameter="{Binding}" Padding="6,4" Margin="4,0" ToolTip.Tip="Переместить ниже">
+                                <PathIcon Data="{StaticResource IconChevronDown}" Width="10" Height="10" Foreground="{DynamicResource TextMutedBrush}" />
+                              </Button>
+                              <Button Grid.Column="3" Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).RemoveSlideshowImageCommand}" CommandParameter="{Binding}" Padding="6,4" ToolTip.Tip="Удалить">
+                                <PathIcon Data="{StaticResource IconTrash}" Width="10" Height="10" Foreground="#F87171" />
+                              </Button>
+                            </Grid>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Интервал смены изображений:" FontSize="12" Foreground="{DynamicResource TextBrightBrush}" />
+                      </StackPanel>
+                      <NumericUpDown Grid.Column="1" Minimum="3" Maximum="60" Value="{Binding SlideshowIntervalSeconds, Mode=TwoWay}" FormatString="{}{0} сек." Width="96" Height="30" Padding="6,2" VerticalAlignment="Center" />
+                    </Grid>
+                    <Slider Minimum="3" Maximum="60" Value="{Binding SlideshowIntervalSeconds, Mode=TwoWay}" />
+                  </StackPanel>
+                </Border>
+
+                <!-- Mode 2: Single Photo or GIF -->
+                <Border Classes="glass-card" Padding="16" IsVisible="{Binding IsModeSinglePhotoOrGif}">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Одиночное фото или GIF анимация" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Поддерживаются статичные фото (PNG, JPG, WEBP) и анимированные .GIF файлы:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBox Grid.Column="0" Text="{Binding Theme.SingleImagePath, Mode=TwoWay}" Watermark="Выберите файл изображения или .gif..." Height="34" Margin="0,0,8,0" />
+                      <Button Grid.Column="1" Classes="btn-outline" Click="OnSelectSingleImageClicked" Content="Выбрать фото / GIF..." Padding="14,6" />
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+                <!-- Mode 3: None (Без фона) -->
+                <Border Classes="glass-card" Padding="16" IsVisible="{Binding IsModeNone}">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="Режим без фона" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Фоновые изображения отключены. На заднем плане отображается монохромный чистый цвет темы лаунчера." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+
+                <!-- General Dimming and Pause Settings for all modes -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Затемнение фона" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Уровень затемнения для лучшей читаемости текста:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <NumericUpDown Grid.Column="1" Minimum="0" Maximum="95" Value="{Binding DimOverlayPercent, Mode=TwoWay}" FormatString="{}{0}%" Width="90" Height="30" Padding="6,2" VerticalAlignment="Center" />
+                    </Grid>
+                    <Slider Minimum="0" Maximum="95" Value="{Binding DimOverlayPercent, Mode=TwoWay}" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 3: JAVA (Freesm Maple layout) -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=3}">
+                
+                <!-- Section 1: Установка Java -->
+                <Border Classes="glass-card" Padding="18">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Установка Java" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                    
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Исполняемый файл Java" FontSize="12" Foreground="{DynamicResource TextBrightBrush}" />
+                      <TextBox Text="{Binding CustomJavaPath, Mode=TwoWay}" Watermark="C:\Program Files\Java\...\bin\javaw.exe" Height="34" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <Button Classes="btn-outline" Command="{Binding AutoFindJavaCommand}" Padding="16,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <TextBlock Text="Найти" FontSize="12" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+
+                      <Button Classes="btn-outline" Click="OnBrowseJavaClicked" Padding="16,8">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="{DynamicResource TextBrightBrush}" />
+                          <TextBlock Text="Обзор" FontSize="12" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                    </StackPanel>
+
+                    <!-- Checkboxes -->
+                    <StackPanel Spacing="8" Margin="0,4,0,0">
+                      <CheckBox IsChecked="{Binding SkipJavaCheck, Mode=TwoWay}" Content="Пропустить проверку совместимости Java" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                      <CheckBox IsChecked="{Binding SkipJavaInstallPrompt, Mode=TwoWay}" Content="Пропустить запрос на установку Java при запуске" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                      <CheckBox IsChecked="{Binding AutoDetectJava, Mode=TwoWay}" Content="Автоопределение версии Java" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                      <CheckBox IsChecked="{Binding AutoDownloadMojangJava, Mode=TwoWay}" Content="Автозагрузка Mojang Java" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+                      <Button Classes="btn-outline" Command="{Binding CheckJavaSettingsCommand}" Padding="16,8">
+                        <TextBlock Text="Проверить настройки" FontSize="12" FontWeight="Bold" />
+                      </Button>
+                      <TextBlock Text="{Binding JavaCheckStatus}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource BrandAccentBrush}" IsVisible="{Binding JavaCheckStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+
+                    <!-- One-click OpenJDK Download buttons -->
+                    <Separator Height="1" Background="#15FFFFFF" Margin="0,6" />
+                    <TextBlock Text="Быстрая загрузка OpenJDK (при отсутствии Java на ПК):" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                    <Grid ColumnDefinitions="*,*">
+                      <Button Grid.Column="0" Classes="btn-ghost" Command="{Binding DownloadJava21Command}" IsEnabled="{Binding !IsDownloadingJava}" Margin="0,0,4,0" Padding="10,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                          <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <TextBlock Text="Скачать Java 21 (OpenJDK)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                      <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding DownloadJava25Command}" IsEnabled="{Binding !IsDownloadingJava}" Margin="4,0,0,0" Padding="10,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                          <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <TextBlock Text="Скачать Java 25 (OpenJDK)" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                    <TextBlock Text="{Binding JavaDownloadStatus}" IsVisible="{Binding JavaDownloadStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" FontSize="11" Foreground="{DynamicResource EmeraldOnlineBrush}" />
+                  </StackPanel>
+                </Border>
+
+                <!-- Section 2: Память -->
+                <Border Classes="glass-card" Padding="18">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Память" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+
+                    <!-- Min RAM (-Xms) -->
+                    <Grid ColumnDefinitions="260,140,Auto" Margin="0,2">
+                      <TextBlock Grid.Column="0" Text="Минимальное использование памяти:" FontSize="12" Foreground="{DynamicResource TextBrightBrush}" VerticalAlignment="Center" />
+                      <NumericUpDown Grid.Column="1" Value="{Binding JavaMinRamMb, Mode=TwoWay}" Minimum="256" Maximum="65536" Increment="256" FormatString="{}{0} MiB" Height="32" Padding="8,2" />
+                      <TextBlock Grid.Column="2" Text="(-Xms)" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    </Grid>
+
+                    <!-- Max RAM (-Xmx) -->
+                    <Grid ColumnDefinitions="260,140,Auto" Margin="0,2">
+                      <TextBlock Grid.Column="0" Text="Максимальное использование памяти:" FontSize="12" Foreground="{DynamicResource TextBrightBrush}" VerticalAlignment="Center" />
+                      <NumericUpDown Grid.Column="1" Value="{Binding JavaMaxRamMb, Mode=TwoWay}" Minimum="1024" Maximum="65536" Increment="512" FormatString="{}{0} MiB" Height="32" Padding="8,2" />
+                      <TextBlock Grid.Column="2" Text="(-Xmx)" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    </Grid>
+
+                    <!-- PermGen (-XX:PermSize) -->
+                    <Grid ColumnDefinitions="260,140,Auto" Margin="0,2">
+                      <TextBlock Grid.Column="0" Text="Размер PermGen:" FontSize="12" Foreground="{DynamicResource TextBrightBrush}" VerticalAlignment="Center" />
+                      <NumericUpDown Grid.Column="1" Value="{Binding JavaPermGenMb, Mode=TwoWay}" Minimum="64" Maximum="4096" Increment="64" FormatString="{}{0} MiB" Height="32" Padding="8,2" />
+                      <TextBlock Grid.Column="2" Text="(-XX:PermSize)" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    </Grid>
+
+                    <!-- Warn low memory -->
+                    <CheckBox IsChecked="{Binding WarnLowMemory, Mode=TwoWay}" Content="Предупреждать при недостатке свободной памяти" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" Margin="0,4,0,0" />
+                  </StackPanel>
+                </Border>
+
+                <!-- Section 3: Аргументы Java -->
+                <Border Classes="glass-card" Padding="18">
+                  <StackPanel Spacing="10">
+                    <TextBlock Text="Аргументы Java" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                    <TextBlock Text="Дополнительные флаги JVM, передаваемые виртуальной машине Java при запуске Minecraft:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBox Text="{Binding CustomJvmArgs, Mode=TwoWay}"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             MinHeight="100"
+                             Height="110"
+                             FontFamily="Consolas, monospace"
+                             FontSize="11"
+                             Watermark="-XX:+UseG1GC -XX:+ParallelRefProcEnabled" />
+                  </StackPanel>
+                </Border>
+
+              </StackPanel>
+
+              <!-- TAB 4: ПАРАМЕТРЫ ИГРЫ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=4}">
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Разрешение игрового окна" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Размер окна Minecraft при запуске:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <CheckBox IsChecked="{Binding UseFullScreen, Mode=TwoWay}" Content="Запускать в полноэкранном режиме (--fullscreen)" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto,*" Margin="0,4,0,0" IsVisible="{Binding !UseFullScreen}">
+                      <TextBlock Grid.Column="0" Text="Ширина:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                      <TextBox Grid.Column="1" Text="{Binding GameWindowWidth, Mode=TwoWay}" Height="34" Margin="0,0,12,0" />
+
+                      <TextBlock Grid.Column="2" Text="Высота:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                      <TextBox Grid.Column="3" Text="{Binding GameWindowHeight, Mode=TwoWay}" Height="34" />
+                    </Grid>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 5: АВТОМАТИЗАЦИЯ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=5}">
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Глобальные команды автоматизации" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Скрипты и команды, выполняемые для всех сборок лаунчера. Поддерживают макросы:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <Border Background="#1A000000" CornerRadius="8" Padding="10">
+                      <TextBlock Text="{}{game_dir} — папка игры&#x0a;{profile_name} — название сборки&#x0a;{version} — версия Minecraft&#x0a;{account} — никнейм игрока&#x0a;{java_path} — путь к javaw.exe" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" FontFamily="Consolas, monospace" />
+                    </Border>
+
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Команда ПЕРЕД запуском игры (Pre-launch):" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" />
+                      <TextBox Text="{Binding GlobalPreLaunchCommand, Mode=TwoWay}" Watermark="powershell.exe -c ..." Height="34" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Команда ПОСЛЕ закрытия игры (Post-launch):" FontSize="11" Foreground="{DynamicResource TextBrightBrush}" />
+                      <TextBox Text="{Binding GlobalPostLaunchCommand, Mode=TwoWay}" Watermark="cmd.exe /c echo Finished" Height="34" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 6: ПЛАГИНЫ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=6}">
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Система расширений (Plugins)" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Подключение пользовательских .NET сборок и модов лаунчера:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="btn-outline" Command="{Binding OpenPluginsFolderCommand}" Margin="0,0,8,0" Padding="10,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="Папка плагинов" FontSize="11" />
+                        </StackPanel>
+                      </Button>
+                      <Button Grid.Column="2" Classes="btn-outline" Command="{Binding RefreshPluginsCommand}" Padding="10,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconRefresh}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="Обновить" FontSize="11" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+
+                    <Button Classes="btn-ghost" Command="{Binding OpenPluginGuideCommand}" HorizontalAlignment="Left" Padding="0,2">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource IconFileText}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                        <TextBlock Text="Открыть руководство по созданию плагинов (PLUGINS_GUIDE.md)" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" TextDecorations="Underline" />
+                      </StackPanel>
+                    </Button>
+
+                    <ItemsControl ItemsSource="{Binding PluginManager.Plugins}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Classes="glass-card" Background="#14FFFFFF" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                            <Grid ColumnDefinitions="*,Auto">
+                              <StackPanel Grid.Column="0" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                  <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="Bold" Foreground="White" />
+                                  <Border Background="#25FFFFFF" CornerRadius="4" Padding="6,1">
+                                    <TextBlock Text="{Binding Version, StringFormat='v{0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                                  </Border>
+                                  <TextBlock Text="{Binding Author, StringFormat='от {0}'}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                              </StackPanel>
+
+                              <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsEnabled, Mode=OneWay}" Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).TogglePluginCommand}" CommandParameter="{Binding}" OnContent="Вкл" OffContent="Выкл" VerticalAlignment="Center" />
+                            </Grid>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 7: DISCORD RPC -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=7}">
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Discord Rich Presence" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Отображение статуса лаунчера и игры в вашем Discord профиле:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <ToggleSwitch Grid.Column="1" IsChecked="{Binding EnableDiscordRpc, Mode=TwoWay}" OnContent="Вкл" OffContent="Выкл" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <StackPanel Spacing="8" IsVisible="{Binding EnableDiscordRpc}">
+                      <StackPanel Spacing="4">
+                        <TextBlock Text="Пользовательский Client ID Discord приложения (опционально):" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Text="{Binding DiscordClientId, Mode=TwoWay}" Watermark="Оставьте пустым для официального приложения Servant" Height="34" />
+                      </StackPanel>
+
+                      <CheckBox IsChecked="{Binding DiscordRpcShowPage, Mode=TwoWay}" Content="Показывать текущую вкладку лаунчера" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                      <CheckBox IsChecked="{Binding DiscordRpcShowProfile, Mode=TwoWay}" Content="Показывать название выбранной сборки" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                      <CheckBox IsChecked="{Binding DiscordRpcShowTime, Mode=TwoWay}" Content="Показывать прошедшее время игры" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <!-- TAB 9: ОПТИМИЗАЦИЯ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=9}">
+                
+                <!-- RAM Optimization Card -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="Оперативная память лаунчера" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Фоновая оптимизация и снижение потребления ОЗУ во время игры:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Background="#1500F5D4" BorderBrush="#3300F5D4" BorderThickness="1" CornerRadius="8" Padding="10,4" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding RamUsageText}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                      </Border>
+                    </Grid>
+
+                    <CheckBox IsChecked="{Binding TrimMemoryInBackground, Mode=TwoWay}" Foreground="{DynamicResource TextBrightBrush}" FontSize="12">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="Освобождать оперативную память в фоне" FontWeight="SemiBold" FontSize="12" />
+                        <TextBlock Text="Автоматически выгружает неиспользуемую память процесса лаунчера при запуске Minecraft и сворачивании в трей (снижает потребление до ~15–25 МБ)" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </CheckBox>
+
+                    <Separator Height="1" Background="#1AFFFFFF" Margin="0,2" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Ручная очистка памяти" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                        <TextBlock Text="{Binding MemoryOptimizationStatus}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Button Grid.Column="1" Classes="btn-outline" Command="{Binding OptimizeMemoryNowCommand}" Padding="14,7">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <PathIcon Data="{StaticResource IconZap}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <TextBlock Text="Очистить память сейчас" FontSize="11" FontWeight="SemiBold" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+                <!-- Launch Action / Resource Saving Card -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Действие при запуске игры" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Экономия ресурсов системы при открытии Minecraft:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <RadioButton GroupName="LaunchAction" IsChecked="{Binding IsActionMinimizeToTray, Mode=TwoWay}" Content="Сворачивать в трей (рекомендуется — минимальная нагрузка на процессор и видеокарту)" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                    <RadioButton GroupName="LaunchAction" IsChecked="{Binding IsActionKeepOpen, Mode=TwoWay}" Content="Оставлять лаунчер открытым" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                    <RadioButton GroupName="LaunchAction" IsChecked="{Binding IsActionClose, Mode=TwoWay}" Content="Полностью закрывать лаунчер при запуске игры" Foreground="{DynamicResource TextBrightBrush}" FontSize="12" />
+                  </StackPanel>
+                </Border>
+
+                <!-- Animations and Graphics Optimization Card -->
+                <Border Classes="glass-card" Padding="16">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="Оптимизация интерфейса и анимаций" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="Снижение нагрузки на видеокарту и CPU в графическом интерфейсе:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <CheckBox IsChecked="{Binding Theme.PauseWhenGameRunning, Mode=TwoWay}" Foreground="{DynamicResource TextBrightBrush}" FontSize="12">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="Останавливать анимации и слайдшоу фона при запущенной игре" FontWeight="SemiBold" FontSize="12" />
+                        <TextBlock Text="Приостанавливает таймеры смены обоев, воспроизведение GIF и рендеры скинов" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                    </CheckBox>
+
+                    <CheckBox IsChecked="{Binding Theme.EnableLogoAnimation, Mode=TwoWay}" Foreground="{DynamicResource TextBrightBrush}" FontSize="12">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="Анимация логотипа при наведении" FontWeight="SemiBold" FontSize="12" />
+                        <TextBlock Text="Эффект вращения и подсветки логотипа в шапке лаунчера при наведении курсора" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                    </CheckBox>
+                  </StackPanel>
+                </Border>
+
+              </StackPanel>
+
+              <!-- TAB 8: О ЛАУНЧЕРЕ И ОБНОВЛЕНИЯ -->
+              <StackPanel Spacing="16" IsVisible="{Binding SelectedCategoryIndex, Converter={StaticResource IntEqualsConverter}, ConverterParameter=8}">
+                
+                <!-- Launcher Header Card -->
+                <Border Classes="glass-card" Padding="24,20" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="1.5">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Border Grid.Column="0" Width="48" Height="48" CornerRadius="14" Background="{DynamicResource BrandPrimaryBrush}" Margin="0,0,16,0" VerticalAlignment="Center">
+                      <PathIcon Data="{StaticResource IconCpu}" Width="24" Height="24" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                      <TextBlock Text="SERVANT LAUNCHER" Classes="heading" FontSize="18" FontWeight="Black" Foreground="White" LetterSpacing="0.5" />
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Текущая версия:" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBlock Text="{Binding LauncherCurrentVersion}" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                      </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="2" Classes="btn-primary" Command="{Binding CheckLauncherUpdateCommand}" IsEnabled="{Binding !IsCheckingLauncherUpdate}" Padding="16,10" VerticalAlignment="Center">
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource IconRefreshCw}" Width="13" Height="13" Foreground="White" />
+                        <TextBlock Text="Проверить лаунчер" FontSize="12" FontWeight="Bold" />
+                      </StackPanel>
+                    </Button>
+                  </Grid>
+                </Border>
+
+                <!-- Status Banner for Launcher -->
+                <Border Background="#14000000" CornerRadius="12" Padding="16,12" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1">
+                  <Grid ColumnDefinitions="Auto,*">
+                    <PathIcon Grid.Column="0" Data="{StaticResource IconInfo}" Width="16" Height="16" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,12,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding LauncherUpdateStatus}" FontSize="12" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" />
+                  </Grid>
+                </Border>
+
+                <!-- Server Pack Update Card -->
+                <Border Classes="glass-card" Padding="20">
+                  <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="3">
+                        <TextBlock Text="СЕРВЕРНАЯ СБОРКА SERVANT (1.21.11)" Classes="heading" FontSize="14" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="Синхронизация официальных модов, шейдеров и конфигураций с сервером:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Background="#159D4EDD" BorderBrush="#339D4EDD" BorderThickness="1" CornerRadius="8" Padding="10,4" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ServerPackCurrentVersion, StringFormat='Сборка v{0}'}" FontSize="12" FontWeight="Bold" Foreground="#C084FC" />
+                      </Border>
+                    </Grid>
+
+                    <Separator Height="1" Background="#1AFFFFFF" Margin="0,2" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="Статус сборки:" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBlock Text="{Binding ServerPackUpdateStatus}" FontSize="12" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" />
+                      </StackPanel>
+
+                      <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CheckServerPackUpdateCommand}" IsEnabled="{Binding !IsCheckingServerPackUpdate}" Padding="16,10" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <PathIcon Data="{StaticResource IconPackage}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                          <TextBlock Text="Обновить сборку" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                  </StackPanel>
+                </Border>
+
+              </StackPanel>
+
+            </Panel>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

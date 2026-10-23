@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
+             x:Class="ServantLauncher.Views.AddSkinDialog"
+             x:DataType="vm:SkinsViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="26" Width="480" MaxHeight="520" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
+      
+      <!-- Dialog Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="ДОБАВЛЕНИЕ СКИНА" Classes="heading" FontSize="17" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Настройте имя, формат рук и плащ персонажа." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CancelAddSkinCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <Separator Grid.Row="0" VerticalAlignment="Bottom" Height="1" Background="#1FFFFFFF" />
+
+      <!-- Scrollable Form Body -->
+      <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,12,0,12">
+        <StackPanel Spacing="16">
+          
+          <!-- Skin Name Input -->
+          <StackPanel Spacing="6">
+            <TextBlock Text="Название скина" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            <TextBox Text="{Binding NewSkinName, Mode=TwoWay}" Watermark="Введите название скина..." Height="38" CornerRadius="12" />
+          </StackPanel>
+
+          <!-- Model Format -->
+          <StackPanel Spacing="6">
+            <TextBlock Text="Формат модели рук" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="14" Padding="4" BorderBrush="#20FFFFFF" BorderThickness="1">
+              <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                <RadioButton Content="Classic (4px)" GroupName="NewSkinModelGroup" IsChecked="{Binding !IsNewSkinSlim, Mode=TwoWay}" Classes="nav-pill" Padding="16,6" FontSize="11" />
+                <RadioButton Content="Slim (3px Alex)" GroupName="NewSkinModelGroup" IsChecked="{Binding IsNewSkinSlim, Mode=TwoWay}" Classes="nav-pill" Padding="16,6" FontSize="11" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+
+          <!-- Cape Selector -->
+          <StackPanel Spacing="6">
+            <TextBlock Text="Плащ из лицензионного аккаунта" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            <ComboBox ItemsSource="{Binding AvailableCapes}" SelectedItem="{Binding NewSkinSelectedCape, Mode=TwoWay}" HorizontalAlignment="Stretch" Height="38" CornerRadius="12">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <Separator Grid.Row="2" VerticalAlignment="Top" Height="1" Background="#1FFFFFFF" />
+
+      <!-- Action Buttons -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,*" Margin="0,14,0,0">
+        <Button Grid.Column="0" Classes="btn-outline" Command="{Binding CancelAddSkinCommand}" Content="Отмена" HorizontalAlignment="Stretch" Margin="0,0,6,0" Padding="14,10" CornerRadius="14" />
+        <Button Grid.Column="1" Classes="btn-primary" Command="{Binding ConfirmAddSkinCommand}" Content="СОХРАНИТЬ В ГАЛЕРЕЮ" HorizontalAlignment="Stretch" Margin="6,0,0,0" Padding="14,10" CornerRadius="14" />
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

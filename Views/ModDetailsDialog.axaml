@@ -1,0 +1,236 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:m="using:ServantLauncher.Models"
+             mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="700"
+             x:Class="ServantLauncher.Views.ModDetailsDialog"
+             x:DataType="vm:ModDetailsViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="26" Width="820" MaxHeight="660" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+      
+      <!-- Header Area: Icon, Title, Author, Downloads, Close -->
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,14">
+        
+        <!-- Mod Icon -->
+        <Border Grid.Column="0" Width="64" Height="64" CornerRadius="16" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" Margin="0,0,16,0" ClipToBounds="True">
+          <Panel>
+            <Image Source="{Binding Project.IconBitmap}" IsVisible="{Binding Project.HasIconBitmap}" Width="64" Height="64" Stretch="UniformToFill" />
+            <PathIcon Data="{StaticResource IconPuzzle}" Width="26" Height="26" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !Project.HasIconBitmap}" />
+          </Panel>
+        </Border>
+
+        <!-- Title & Metadata -->
+        <StackPanel Grid.Column="1" Spacing="5" VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="{Binding Project.Title}" Classes="heading" FontSize="20" FontWeight="Black" Foreground="White" />
+            <Border Background="{DynamicResource BrandAccentAlphaBrush}" BorderBrush="{DynamicResource BrandAccentBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="6,2" VerticalAlignment="Center" IsVisible="{Binding IsModpack}">
+              <TextBlock Text="СБОРКА" FontSize="10" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" />
+            </Border>
+            <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="6,2" VerticalAlignment="Center">
+              <TextBlock Text="{Binding Project.Author, StringFormat='от {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+            </Border>
+          </StackPanel>
+
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <PathIcon Data="{StaticResource IconDownload}" Width="10" Height="10" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+              <TextBlock Text="{Binding Project.FormattedDownloads, StringFormat='{}{0} скачиваний'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+            </StackPanel>
+            <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+            <TextBlock Text="{Binding Project.DisplayCategories}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Close Button -->
+        <Button Grid.Column="2" Classes="btn-outline" Command="{Binding CloseCommand}" Width="36" Height="36" Padding="0" CornerRadius="18" VerticalAlignment="Top">
+          <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <!-- Sub-Navigation Tabs: Описание / Версии / Галерея -->
+      <Border Grid.Row="1" Background="#121118" CornerRadius="12" Padding="4" Margin="0,0,0,14" HorizontalAlignment="Left">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <Button Classes="tab-pill" Classes.active="{Binding IsTabDescription}" Command="{Binding SelectTabCommand}" CommandParameter="description" Padding="14,6">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconSliders}" Width="13" Height="13" />
+              <TextBlock Text="Описание" FontSize="12" FontWeight="SemiBold" />
+            </StackPanel>
+          </Button>
+
+          <Button Classes="tab-pill" Classes.active="{Binding IsTabVersions}" Command="{Binding SelectTabCommand}" CommandParameter="versions" Padding="14,6">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconDownload}" Width="13" Height="13" />
+              <TextBlock Text="Версии" FontSize="12" FontWeight="SemiBold" />
+              <Border Background="#262335" CornerRadius="8" Padding="6,1" Margin="2,0,0,0" IsVisible="{Binding Versions.Count}">
+                <TextBlock Text="{Binding Versions.Count}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+              </Border>
+            </StackPanel>
+          </Button>
+
+          <Button Classes="tab-pill" Classes.active="{Binding IsTabGallery}" Command="{Binding SelectTabCommand}" CommandParameter="gallery" Padding="14,6" IsVisible="{Binding HasGallery}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconEye}" Width="13" Height="13" />
+              <TextBlock Text="Галерея" FontSize="12" FontWeight="SemiBold" />
+              <Border Background="#262335" CornerRadius="8" Padding="6,1" Margin="2,0,0,0" IsVisible="{Binding GalleryBlocks.Count}">
+                <TextBlock Text="{Binding GalleryBlocks.Count}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+              </Border>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <!-- Main Content Scroll Area -->
+      <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12">
+        <Panel>
+
+          <!-- TAB 0: Описание & Markdown Body -->
+          <StackPanel Spacing="16" IsVisible="{Binding IsTabDescription}">
+            <!-- Short Summary Card -->
+            <Border Classes="glass-card" Background="#16151E" Padding="16" CornerRadius="12">
+              <TextBlock Text="{Binding Project.Description}" FontSize="13" Foreground="{DynamicResource TextBrightBrush}" TextWrapping="Wrap" LineHeight="20" />
+            </Border>
+
+            <!-- Parsed Markdown Blocks -->
+            <ItemsControl ItemsSource="{Binding MarkdownBlocks}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="m:MarkdownBlock">
+                  <Border Margin="0,3">
+                    <Panel>
+                      <!-- Heading 1 -->
+                      <TextBlock Text="{Binding Text}" IsVisible="{Binding IsHeading1}" FontSize="17" FontWeight="Black" Foreground="White" Margin="0,10,0,4" />
+                      
+                      <!-- Heading 2 -->
+                      <TextBlock Text="{Binding Text}" IsVisible="{Binding IsHeading2}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,8,0,3" />
+
+                      <!-- Heading 3 -->
+                      <TextBlock Text="{Binding Text}" IsVisible="{Binding IsHeading3}" FontSize="13" FontWeight="Bold" Foreground="White" Margin="0,6,0,2" />
+
+                      <!-- Paragraph -->
+                      <TextBlock Text="{Binding Text}" IsVisible="{Binding IsParagraph}" FontSize="12.5" Foreground="{DynamicResource TextBrightBrush}" TextWrapping="Wrap" LineHeight="19" />
+
+                      <!-- Bullet -->
+                      <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsBullet}" Margin="4,2,0,2">
+                        <TextBlock Grid.Column="0" Text="• " FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,6,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Text}" FontSize="12.5" Foreground="{DynamicResource TextBrightBrush}" TextWrapping="Wrap" />
+                      </Grid>
+
+                      <!-- Table row -->
+                      <Border Background="#161422" CornerRadius="8" Padding="12,8" BorderBrush="#252233" BorderThickness="1" IsVisible="{Binding IsTable}" Margin="0,2">
+                        <TextBlock Text="{Binding Text}" FontFamily="Consolas, monospace" FontSize="11.5" Foreground="{DynamicResource TextBrightBrush}" />
+                      </Border>
+
+                      <!-- Code Block -->
+                      <Border Background="#121118" CornerRadius="8" Padding="12" BorderBrush="#252233" BorderThickness="1" IsVisible="{Binding IsCode}" Margin="0,4">
+                        <TextBlock Text="{Binding Text}" FontFamily="Consolas, monospace" FontSize="11.5" Foreground="{DynamicResource BrandAccentBrush}" TextWrapping="Wrap" />
+                      </Border>
+
+                      <!-- Badge Image (Compact) -->
+                      <Border CornerRadius="6" ClipToBounds="True" MaxHeight="38" HorizontalAlignment="Left" IsVisible="{Binding IsBadge}" Margin="0,4">
+                        <Image Source="{Binding ImageBitmap}" MaxHeight="36" Stretch="Uniform" />
+                      </Border>
+
+                      <!-- Embedded Regular Screenshot/Banner Image -->
+                      <Border CornerRadius="8" ClipToBounds="True" Background="#14131A" MaxHeight="300" HorizontalAlignment="Left" IsVisible="{Binding IsImage}" Margin="0,6">
+                        <Panel IsVisible="{Binding !IsBadge}">
+                          <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="280" />
+                          <TextBlock Text="{Binding Text}" IsVisible="{Binding !HasImageBitmap}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Padding="8" />
+                        </Panel>
+                      </Border>
+                    </Panel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+
+          <!-- TAB 1: Версии -->
+          <StackPanel Spacing="10" IsVisible="{Binding IsTabVersions}">
+            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+              <TextBlock Grid.Column="0" Text="{Binding VersionsTitleText}" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+            </Grid>
+
+            <ItemsControl ItemsSource="{Binding Versions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="m:ModrinthVersion">
+                  <Border Classes="glass-card" Margin="0,0,0,8" Padding="14" CornerRadius="12">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                      
+                      <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="13" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding VersionNumber, StringFormat='Версия: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                          <TextBlock Text="{Binding Dependencies.Count, StringFormat='• {0} зависимостей'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" IsVisible="{Binding Dependencies.Count}" />
+                        </StackPanel>
+                      </StackPanel>
+
+                      <Border Grid.Column="1" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="8,4" Margin="10,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DisplayGameVersions}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+                      </Border>
+
+                      <Border Grid.Column="2" Background="#1E1C28" CornerRadius="6" Padding="8,4" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DisplayLoaders}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource PillActiveBgBrush}" />
+                      </Border>
+
+                      <Button Grid.Column="3" Classes="btn-primary" Command="{Binding $parent[UserControl].((vm:ModDetailsViewModel)DataContext).InstallVersionCommand}" CommandParameter="{Binding}" Padding="16,8" FontSize="11" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconDownload}" Width="13" Height="13" Foreground="White" />
+                          <TextBlock Text="{Binding $parent[UserControl].((vm:ModDetailsViewModel)DataContext).InstallButtonText}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                        </StackPanel>
+                      </Button>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="12" Padding="24" IsVisible="{Binding !Versions.Count}">
+              <TextBlock Text="Доступных версий не найдено." Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+            </Border>
+          </StackPanel>
+
+          <!-- TAB 2: Галерея -->
+          <StackPanel Spacing="12" IsVisible="{Binding IsTabGallery}">
+            <TextBlock Text="{Binding GalleryTitleText}" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            
+            <ItemsControl ItemsSource="{Binding GalleryBlocks}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="m:MarkdownBlock">
+                  <Border Classes="glass-card" Margin="0,0,12,12" Width="360" CornerRadius="12" ClipToBounds="True">
+                    <StackPanel>
+                      <Border Height="200" Background="#121118">
+                        <Panel>
+                          <Image Source="{Binding ImageBitmap}" Stretch="UniformToFill" Height="200" />
+                          <PathIcon Data="{StaticResource IconEye}" Width="24" Height="24" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasImageBitmap}" />
+                        </Panel>
+                      </Border>
+                      <Border Padding="10" Background="#181722" IsVisible="{Binding Text, Converter={x:Null}}">
+                        <TextBlock Text="{Binding Text}" FontSize="11.5" Foreground="{DynamicResource TextBrightBrush}" TextWrapping="Wrap" />
+                      </Border>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+
+        </Panel>
+      </ScrollViewer>
+
+      <!-- Bottom Status & Actions -->
+      <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+        <TextBlock Grid.Column="0" Text="{Binding StatusText}" FontSize="12" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CloseCommand}" Content="Закрыть" Padding="24,9" CornerRadius="10" />
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

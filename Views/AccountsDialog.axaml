@@ -1,0 +1,154 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="600"
+             x:Class="ServantLauncher.Views.AccountsDialog"
+             x:DataType="vm:AccountsViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="26" Width="580" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
+      
+      <!-- Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="УПРАВЛЕНИЕ АККАУНТАМИ" Classes="heading" FontSize="17" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Лицензия Microsoft или офлайн профиль." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CloseDialogCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <Separator Grid.Row="0" VerticalAlignment="Bottom" Height="1" Background="#1FFFFFFF" />
+
+      <!-- Body -->
+      <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,12,0,12">
+        <StackPanel Spacing="16">
+          
+          <!-- MICROSOFT AUTH SECTION -->
+          <Border Classes="glass-card" Padding="14">
+            <StackPanel Spacing="10">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                  <TextBlock Text="Лицензия Microsoft / Xbox" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+                  <TextBlock Text="Безопасный вход с DPAPI-шифрованием токенов." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="btn-primary" Command="{Binding StartMicrosoftLoginCommand}" IsVisible="{Binding !IsAuthenticatingMicrosoft}" Content="Войти через Microsoft" Padding="16,8" />
+              </Grid>
+
+              <!-- ERROR BANNER (If login failed) -->
+              <Border Background="#250F14" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="12" Padding="12,10" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Grid ColumnDefinitions="Auto,*">
+                  <PathIcon Grid.Column="0" Data="{StaticResource IconClose}" Width="14" Height="14" Foreground="#EF4444" Margin="0,0,10,0" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" FontSize="11" FontWeight="SemiBold" Foreground="#FCA5A5" TextWrapping="Wrap" />
+                </Grid>
+              </Border>
+
+              <!-- Active Microsoft Device Auth Prompt -->
+              <Border Background="{DynamicResource BtnOutlineBgBrush}" CornerRadius="16" Padding="16" IsVisible="{Binding IsAuthenticatingMicrosoft}">
+                <StackPanel Spacing="12">
+                  <TextBlock Text="{Binding AuthStatusText}" FontSize="12" Foreground="{DynamicResource BrandAccentBrush}" TextWrapping="Wrap" />
+                  
+                  <!-- Code display & Actions -->
+                  <StackPanel Spacing="10" IsVisible="{Binding HasUserCode}">
+                    
+                    <!-- Code Card with Copy Button -->
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                      
+                      <!-- Code Display -->
+                      <Border Grid.Column="0" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" CornerRadius="12" Padding="14,10" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding MicrosoftUserCode}" Classes="heading" FontSize="22" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" LetterSpacing="4" />
+                      </Border>
+
+                      <!-- COPY CODE BUTTON -->
+                      <Button Grid.Column="1" Classes="btn-purple" Command="{Binding CopyCodeToClipboardCommand}" ToolTip.Tip="Скопировать код в буфер обмена" Padding="14,10" Margin="0,0,8,0" CornerRadius="12">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconCopy}" Width="14" Height="14" Foreground="White" IsVisible="{Binding !IsCodeCopied}" />
+                          <TextBlock Text="Скопировать" FontWeight="Bold" FontSize="12" IsVisible="{Binding !IsCodeCopied}" />
+                          <TextBlock Text="Скопировано! ✓" FontWeight="Bold" FontSize="12" Foreground="#34D399" IsVisible="{Binding IsCodeCopied}" />
+                        </StackPanel>
+                      </Button>
+
+                      <!-- OPEN SITE BUTTON -->
+                      <Button Grid.Column="2" Classes="btn-primary" Command="{Binding OpenBrowserAuthCommand}" ToolTip.Tip="Открыть сайт авторизации Microsoft" Padding="14,10" CornerRadius="12">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                          <PathIcon Data="{StaticResource IconExternalLink}" Width="14" Height="14" Foreground="#09090B" />
+                          <TextBlock Text="Перейти на сайт" FontWeight="Bold" FontSize="12" Foreground="#09090B" />
+                        </StackPanel>
+                      </Button>
+
+                    </Grid>
+
+                    <!-- User Friendly Steps Guide -->
+                    <Border Background="{DynamicResource BtnOutlineBgBrush}" CornerRadius="10" Padding="10,8">
+                      <TextBlock Text="Инструкция: 1. Скопируйте код → 2. Перейдите на сайт microsoft.com/link → 3. Вставьте код и войдите в свой аккаунт." FontSize="10" Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" />
+                    </Border>
+
+                  </StackPanel>
+
+                  <Button Classes="btn-outline" Command="{Binding CancelMicrosoftLoginCommand}" Content="Отмена" HorizontalAlignment="Right" Padding="16,6" Margin="0,4,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <!-- OFFLINE NICKNAME AUTH SECTION -->
+          <Border Classes="glass-card" Padding="14">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Офлайн вход (по нику)" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="White" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0" Text="{Binding OfflineUsername, Mode=TwoWay}" Watermark="Введите никнейм игрока..." Margin="0,0,10,0" Height="40">
+                  <TextBox.InnerLeftContent>
+                    <PathIcon Data="{StaticResource IconUser}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" Margin="10,0,4,0" />
+                  </TextBox.InnerLeftContent>
+                </TextBox>
+                <Button Grid.Column="1" Classes="btn-purple" Command="{Binding AddOfflineAccountCommand}" Content="Войти" Padding="22,0" Height="40" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- SAVED ACCOUNTS LIST -->
+          <TextBlock Text="СОХРАНЕННЫЕ АККАУНТЫ" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" Margin="2,0" />
+
+          <ItemsControl ItemsSource="{Binding Accounts}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Classes="glass-card" Margin="0,0,0,6" Padding="10">
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    
+                    <!-- Avatar head icon -->
+                    <Border Grid.Column="0" Width="34" Height="34" CornerRadius="8" Background="{DynamicResource CardBgHoverBrush}" Margin="0,0,10,0" ClipToBounds="True" VerticalAlignment="Center">
+                      <Panel>
+                        <Image Source="{Binding HeadBitmap}" IsVisible="{Binding HasHeadBitmap}" Width="34" Height="34" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="None" />
+                        <PathIcon Data="{StaticResource IconUser}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasHeadBitmap}" />
+                      </Panel>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Username}" FontWeight="Bold" Foreground="White" FontSize="12" />
+                      <TextBlock Text="{Binding TypeBadge}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="2" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:AccountsViewModel)DataContext).SelectAccountCommand}" CommandParameter="{Binding}" Content="Выбрать" Padding="12,5" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <Button Grid.Column="3" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:AccountsViewModel)DataContext).RemoveAccountCommand}" CommandParameter="{Binding}" ToolTip.Tip="Удалить аккаунт" Padding="8,5" VerticalAlignment="Center">
+                      <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+                    </Button>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Footer -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CloseDialogCommand}" Content="Закрыть" Padding="20,8" />
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

@@ -1,0 +1,63 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ServantLauncher.Views.ConsoleView"
+             x:DataType="vm:ConsoleViewModel">
+
+  <Grid RowDefinitions="Auto,*" Margin="24">
+    
+    <!-- Top Action Bar -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+      <StackPanel Grid.Column="0" Spacing="4">
+        <TextBlock Text="КОНСОЛЬ И ЛОГИ ИГРЫ" Classes="heading" FontSize="20" FontWeight="Bold" Foreground="White" />
+        <TextBlock Text="Вывод сообщений клиента, отладочная информация и логи загрузчика в реальном времени." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <TextBlock Text="{Binding StatusNotification}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource EmeraldOnlineBrush}" VerticalAlignment="Center" Margin="0,0,8,0" IsVisible="{Binding StatusNotification, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <Button Classes="btn-outline" Command="{Binding ClearCommand}" Padding="14,8" ToolTip.Tip="Очистить экран консоли">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconTrash}" Width="13" Height="13" Foreground="{DynamicResource TextMutedBrush}" />
+            <TextBlock Text="Очистить" FontSize="11" FontWeight="SemiBold" />
+          </StackPanel>
+        </Button>
+
+        <Button Classes="btn-outline" Command="{Binding UploadToMcLogsCommand}" IsEnabled="{Binding !IsUploadingMcLogs}" Padding="14,8" ToolTip.Tip="Загрузить лог на сервис mclo.gs и скопировать ссылку">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconGlobe}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+            <TextBlock Text="Загрузить на mclo.gs" FontSize="11" FontWeight="SemiBold" />
+          </StackPanel>
+        </Button>
+
+        <Button Classes="btn-purple" Command="{Binding CopyFullLogCommand}" Padding="16,8" ToolTip.Tip="Скопировать весь лог в буфер обмена">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <PathIcon Data="{StaticResource IconCopy}" Width="13" Height="13" Foreground="White" />
+            <TextBlock Text="Скопировать лог" FontSize="11" FontWeight="Bold" IsVisible="{Binding !IsCopied}" />
+            <TextBlock Text="Скопировано! ✓" FontSize="11" FontWeight="Bold" Foreground="#34D399" IsVisible="{Binding IsCopied}" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <!-- Console Output Container -->
+    <Border Grid.Row="1" Background="#0C0B12" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" CornerRadius="18" Padding="16">
+      <ScrollViewer Name="LogScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Logs}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="Auto,*" Margin="0,2">
+                <SelectableTextBlock Grid.Column="0" Text="{Binding Time, StringFormat='[{0}]'}" FontFamily="Consolas, monospace" FontSize="12" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,8,0" SelectionBrush="{DynamicResource BrandAccentBrush}" />
+                <SelectableTextBlock Grid.Column="1" Text="{Binding Message}" FontFamily="Consolas, monospace" FontSize="12" Foreground="{Binding ColorBrush}" TextWrapping="Wrap" SelectionBrush="{DynamicResource BrandAccentBrush}" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+  </Grid>
+</UserControl>

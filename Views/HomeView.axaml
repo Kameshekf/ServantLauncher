@@ -1,0 +1,194 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ServantLauncher.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+
+  <UserControl.Styles>
+    <!-- Dropdown arrow smooth 180deg flip animation -->
+    <Style Selector="PathIcon.dropdown-arrow">
+      <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+      <Setter Property="RenderTransform" Value="rotate(0deg)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="PathIcon.dropdown-arrow.open">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+
+    <!-- Profile item subtle hover shift -->
+    <Style Selector="Button.profile-item">
+      <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut" />
+          <BrushTransition Property="Background" Duration="0:0:0.15" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.profile-item:pointerover">
+      <Setter Property="RenderTransform" Value="translateX(4px)" />
+    </Style>
+
+    <!-- Dropdown container transition -->
+    <Style Selector="Border.dropdown-container">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
+
+  <Grid>
+    <!-- CENTER BRANDING & PLAY AREA -->
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Margin="0,0,0,20">
+      
+      <!-- Servant Logo & Title -->
+      <StackPanel HorizontalAlignment="Center" Spacing="14">
+        
+        <!-- LARGE ROUNDED HERO LOGO (Smooth hover scale) -->
+        <Border x:Name="HeroLogoCard"
+                Classes="hero-logo-card"
+                Classes.animated="{Binding IsLogoAnimationEnabled}"
+                Width="180" Height="180"
+                RenderTransformOrigin="50%,50%"
+                Background="Transparent"
+                ClipToBounds="False"
+                HorizontalAlignment="Center"
+                Cursor="Hand">
+          <Border CornerRadius="44" ClipToBounds="True" Width="180" Height="180">
+            <Image Source="avares://ServantLauncher/Assets/Images/server-icon-rounded.png" Width="180" Height="180" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapInterpolationMode="HighQuality" />
+          </Border>
+        </Border>
+
+        <!-- Main Title with BETA badge -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,4,0,0">
+          <TextBlock Text="SERVANT" Classes="heading" FontSize="38" FontWeight="Black" Foreground="White" LetterSpacing="3" VerticalAlignment="Center" />
+          <Border Background="{DynamicResource BrandAccentAlphaBrush}" BorderBrush="{DynamicResource BrandAccentBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8,3" VerticalAlignment="Center">
+            <TextBlock Text="BETA" FontSize="11" FontWeight="Black" Foreground="{DynamicResource BrandAccentBrush}" LetterSpacing="1.5" />
+          </Border>
+        </StackPanel>
+      </StackPanel>
+
+      <!-- PLAY & PROFILE COMBO BAR -->
+      <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1.5" CornerRadius="22" Padding="12" Width="540" HorizontalAlignment="Center">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto">
+            
+            <!-- Left: Profile Selector Button (Dropdown toggle) -->
+            <Button Grid.Column="0" Classes="btn-ghost" Command="{Binding ToggleProfileDropdownCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="12,8" CornerRadius="14" Margin="0,0,10,0">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="12" Background="{DynamicResource PillActiveBgBrush}" Margin="0,0,12,0" VerticalAlignment="Center" ClipToBounds="True">
+                  <Panel>
+                    <Image Source="{Binding ActiveProfile.IconBitmap}" IsVisible="{Binding ActiveProfile.HasCustomIcon}" Width="40" Height="40" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    <PathIcon Data="{StaticResource IconBoxes}" Width="18" Height="18" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !ActiveProfile.HasCustomIcon}" />
+                  </Panel>
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                  <TextBlock Text="{Binding ActiveProfile.Name, FallbackValue='Сборка не выбрана'}" Classes="heading" FontSize="14" FontWeight="Black" Foreground="White" TextTrimming="CharacterEllipsis" />
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding ActiveProfile.GameVersion, FallbackValue='1.21.11'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" />
+                    <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" IsVisible="{Binding ActiveProfile, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <TextBlock Text="{Binding ActiveProfile.LoaderType}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" FontWeight="SemiBold" IsVisible="{Binding ActiveProfile, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <TextBlock Text="•" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" IsVisible="{Binding ActiveProfile, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <StackPanel Orientation="Horizontal" Spacing="3" IsVisible="{Binding ActiveProfile, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      <PathIcon Data="{StaticResource IconClock}" Width="10" Height="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                      <TextBlock Text="{Binding ActiveProfile.PlayTimeText}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" FontWeight="SemiBold" />
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+                <PathIcon Grid.Column="2" Classes="dropdown-arrow" Classes.open="{Binding IsProfileDropdownOpen}" Data="{StaticResource IconChevronDown}" Width="14" Height="14" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" Margin="8,0,0,0" />
+              </Grid>
+            </Button>
+
+            <!-- Right: Action / Play Buttons -->
+            <!-- Normal Play / Install Button -->
+            <Button Grid.Column="1" Classes="btn-primary" Command="{Binding RequestPlayCommand}" IsVisible="{Binding ShowPlayButton}" Padding="28,14" CornerRadius="16" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource IconPlay}" Width="16" Height="16" Foreground="#09090B" IsVisible="{Binding IsProfileInstalled}" />
+                <PathIcon Data="{StaticResource IconDownload}" Width="16" Height="16" Foreground="#09090B" IsVisible="{Binding !IsProfileInstalled}" />
+                <TextBlock Text="{Binding PlayButtonText}" Classes="heading" FontSize="14" FontWeight="Black" Foreground="#09090B" LetterSpacing="1.5" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+            <!-- Cancel Button during Launch -->
+            <Button Grid.Column="1" Classes="btn-danger" Command="{Binding RequestCancelLaunchCommand}" IsVisible="{Binding ShowCancelButton}" Padding="24,14" CornerRadius="16" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14" Foreground="White" />
+                <TextBlock Text="ОТМЕНА" Classes="heading" FontSize="13" FontWeight="Black" Foreground="White" LetterSpacing="1" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+            <!-- Close Game Button while Running -->
+            <Button Grid.Column="1" Classes="btn-danger" Command="{Binding RequestCloseGameCommand}" IsVisible="{Binding ShowCloseGameButton}" Padding="22,14" CornerRadius="16" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <PathIcon Data="{StaticResource IconClose}" Width="14" Height="14" Foreground="White" />
+                <TextBlock Text="ЗАКРЫТЬ ИГРУ" Classes="heading" FontSize="12" FontWeight="Black" Foreground="White" LetterSpacing="0.5" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+          </Grid>
+
+          <!-- Dropdown List of Profiles when opened -->
+          <Border Classes="dropdown-container" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderCardBrush}" BorderThickness="1" CornerRadius="14" Padding="8" MaxHeight="220" IsVisible="{Binding IsProfileDropdownOpen}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel Spacing="4">
+                <ItemsControl ItemsSource="{Binding Profiles}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Button Classes="btn-ghost profile-item" Command="{Binding $parent[UserControl].((vm:HomeViewModel)DataContext).SelectProfileCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="10,8" CornerRadius="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                          <Border Grid.Column="0" Width="26" Height="26" CornerRadius="8" Background="{DynamicResource PillActiveBgBrush}" Margin="0,0,10,0" VerticalAlignment="Center" ClipToBounds="True">
+                            <Panel>
+                              <Image Source="{Binding IconBitmap}" IsVisible="{Binding HasCustomIcon}" Width="26" Height="26" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                              <PathIcon Data="{StaticResource IconBoxes}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasCustomIcon}" />
+                            </Panel>
+                          </Border>
+                          <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" FontSize="12" Foreground="White" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Grid.Column="2" Text="{Binding GameVersion}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Separator Height="1" Background="{DynamicResource BorderCardBrush}" Margin="0,4" />
+
+                <!-- Quick Actions: Create Profile or Go to All Profiles -->
+                <Grid ColumnDefinitions="*,*">
+                  <Button Grid.Column="0" Classes="btn-ghost profile-item" Command="{Binding RequestCreateProfileCommand}" HorizontalAlignment="Stretch" Padding="8,6" CornerRadius="8">
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                      <PathIcon Data="{StaticResource IconPlus}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                      <TextBlock Text="Создать сборку" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Column="1" Classes="btn-ghost profile-item" Command="{Binding NavigateToProfilesCommand}" HorizontalAlignment="Stretch" Padding="8,6" CornerRadius="8">
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                      <PathIcon Data="{StaticResource IconBoxes}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                      <TextBlock Text="Все сборки" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </StackPanel>
+            </ScrollViewer>
+          </Border>
+
+          <!-- Progress Bar during Launch -->
+          <StackPanel Spacing="6" IsVisible="{Binding ShowProgressBar}">
+            <ProgressBar Value="{Binding LaunchProgressPercent}" Minimum="0" Maximum="100" Height="6" />
+            <TextBlock Text="{Binding LaunchStatusText}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" />
+          </StackPanel>
+
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+  </Grid>
+</UserControl>

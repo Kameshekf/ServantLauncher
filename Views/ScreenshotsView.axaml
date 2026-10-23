@@ -1,0 +1,245 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ServantLauncher.Views.ScreenshotsView"
+             x:DataType="vm:ScreenshotsViewModel">
+
+  <Grid>
+    <!-- MAIN SCREENSHOTS GALLERY -->
+    <Grid RowDefinitions="Auto,*" Margin="24,16,24,20">
+      
+      <!-- TOP HEADER & CONTROLS (Matching media_1789668989939.png) -->
+      <StackPanel Grid.Row="0" Spacing="14" Margin="0,0,0,16">
+        
+        <!-- Row 1: Title & Action Buttons -->
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Text="Скриншоты" Classes="heading" FontSize="24" FontWeight="Black" Foreground="White" VerticalAlignment="Center" />
+          
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <!-- Open Screenshots Folder -->
+            <Button Classes="btn-outline" Command="{Binding OpenScreenshotsFolderCommand}" Padding="14,8" ToolTip.Tip="Открыть папку со скриншотами">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconFolderOpen}" Width="13" Height="13" Foreground="{DynamicResource TextBrightBrush}" />
+                <TextBlock Text="Открыть папку" FontSize="11" FontWeight="SemiBold" />
+              </StackPanel>
+            </Button>
+
+            <!-- Refresh Button -->
+            <Button Classes="btn-outline" Command="{Binding RefreshCommand}" Width="36" Height="36" Padding="0" ToolTip.Tip="Обновить галерею">
+              <PathIcon Data="{StaticResource IconRefresh}" Width="13" Height="13" Foreground="{DynamicResource TextBrightBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+          </StackPanel>
+        </Grid>
+
+        <!-- Row 2: Search Box -->
+        <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Поиск по названию скриншота или сборки..." Height="40">
+          <TextBox.InnerLeftContent>
+            <PathIcon Data="{StaticResource IconSearch}" Width="13" Height="13" Foreground="{DynamicResource TextMutedBrush}" Margin="12,0,6,0" />
+          </TextBox.InnerLeftContent>
+        </TextBox>
+
+        <!-- Row 3: Filters & Sorting Bar -->
+        <WrapPanel Orientation="Horizontal">
+          
+          <!-- Sort Dropdown: Сначала новые / старые / имя -->
+          <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="12" Padding="4,2" Margin="0,0,10,6">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="6,0">
+              <PathIcon Data="{StaticResource IconSlidersHorizontal}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+              <ComboBox SelectedIndex="{Binding SelectedSortIndex, Mode=TwoWay}" BorderThickness="0" Background="Transparent" FontSize="11" FontWeight="SemiBold">
+                <ComboBoxItem Content="Сначала новые" />
+                <ComboBoxItem Content="Сначала старые" />
+                <ComboBoxItem Content="По названию" />
+              </ComboBox>
+            </StackPanel>
+          </Border>
+
+          <!-- Profile Filter Dropdown (Hidden if Scoped to Profile) -->
+          <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="12" Padding="4,2" Margin="0,0,10,6" IsVisible="{Binding !IsScopedToProfile}">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="6,0">
+              <PathIcon Data="{StaticResource IconBoxes}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+              <ComboBox ItemsSource="{Binding ProfileFilterOptions}" SelectedItem="{Binding SelectedProfileFilter, Mode=TwoWay}" BorderThickness="0" Background="Transparent" FontSize="11" FontWeight="SemiBold" MaxDropDownHeight="300" />
+            </StackPanel>
+          </Border>
+
+          <!-- Total Count Badge -->
+          <Border Background="#20FFFFFF" CornerRadius="12" Padding="10,6" Margin="0,0,0,6" VerticalAlignment="Center">
+            <TextBlock Text="{Binding TotalCount, StringFormat='Всего: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+          </Border>
+
+        </WrapPanel>
+
+      </StackPanel>
+
+      <!-- CONTENT AREA -->
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Panel>
+          
+          <!-- EMPTY STATE -->
+          <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" Margin="0,60,0,0">
+            <Border Width="68" Height="68" CornerRadius="22" Background="{DynamicResource CardBgHoverBrush}" BorderBrush="#30FFFFFF" BorderThickness="1.5" HorizontalAlignment="Center">
+              <PathIcon Data="{StaticResource IconImage}" Width="30" Height="30" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <StackPanel Spacing="6" HorizontalAlignment="Center">
+              <TextBlock Text="Скриншотов пока нет" Classes="heading" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" />
+              <TextBlock Text="Делайте скриншоты в игре клавишей F2 — они автоматически появятся в этой галерее." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="440" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- GROUPS OF SCREENSHOTS (Grouped by Date) -->
+          <ItemsControl ItemsSource="{Binding Groups}" IsVisible="{Binding !IsEmpty}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Spacing="10" Margin="0,0,0,24">
+                  
+                  <!-- Group Header (e.g. "В этом месяце" 5) -->
+                  <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="2,0,0,4">
+                    <PathIcon Data="{StaticResource IconChevronDown}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Title}" Classes="heading" FontSize="14" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
+                    <Border Background="{DynamicResource BrandAccentAlphaBrush}" CornerRadius="8" Padding="7,2" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Count}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                    </Border>
+                  </StackPanel>
+
+                  <!-- Screenshots Cards Grid -->
+                  <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Border Classes="glass-card" Width="320" Height="215" Margin="0,0,14,14" CornerRadius="16" ClipToBounds="True" Background="{DynamicResource CardBgBrush}" BorderBrush="#25FFFFFF" BorderThickness="1">
+                          <Grid>
+                            <!-- Clickable background image thumbnail -->
+                            <Button Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ScreenshotsViewModel)DataContext).OpenPreviewCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0">
+                              <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                
+                                <!-- Dark gradient at bottom for text readability -->
+                                <Border VerticalAlignment="Bottom" Height="80">
+                                  <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                      <GradientStop Color="#00000000" Offset="0" />
+                                      <GradientStop Color="#E60A0812" Offset="1" />
+                                    </LinearGradientBrush>
+                                  </Border.Background>
+                                </Border>
+                              </Panel>
+                            </Button>
+
+                            <!-- Bottom Card Info & Actions Overlay -->
+                            <Grid VerticalAlignment="Bottom" ColumnDefinitions="*,Auto" Margin="12,8" IsHitTestVisible="True">
+                              <!-- Filename & Profile Badge -->
+                              <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Bottom">
+                                <TextBlock Text="{Binding FileName}" FontSize="12" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FileName}" />
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                  <Border Background="{DynamicResource BrandAccentAlphaBrush}" CornerRadius="4" Padding="5,1">
+                                    <TextBlock Text="{Binding ProfileName}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" TextTrimming="CharacterEllipsis" MaxWidth="140" />
+                                  </Border>
+                                  <TextBlock Text="{Binding FormattedSize}" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+                                </StackPanel>
+                              </StackPanel>
+
+                              <!-- Action Buttons -->
+                              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Bottom">
+                                <!-- Open in explorer -->
+                                <Button Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ScreenshotsViewModel)DataContext).OpenInExplorerCommand}" CommandParameter="{Binding}" Width="28" Height="28" Padding="0" CornerRadius="6" ToolTip.Tip="Показать в проводнике">
+                                  <PathIcon Data="{StaticResource IconFolderOpen}" Width="12" Height="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Button>
+
+                                <!-- Delete button -->
+                                <Button Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:ScreenshotsViewModel)DataContext).DeleteScreenshotCommand}" CommandParameter="{Binding}" Width="28" Height="28" Padding="0" CornerRadius="6" ToolTip.Tip="Удалить скриншот">
+                                  <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="#EF4444" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Button>
+                              </StackPanel>
+                            </Grid>
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                  </ItemsControl>
+
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+        </Panel>
+      </ScrollViewer>
+
+    </Grid>
+
+    <!-- FULLSCREEN IMAGE PREVIEW MODAL OVERLAY -->
+    <Border Background="#EE08070F" IsVisible="{Binding IsPreviewOpen}" ZIndex="999">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+        
+        <!-- Top Preview Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+          <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+            <TextBlock Text="{Binding SelectedScreenshot.FileName}" Classes="heading" FontSize="16" FontWeight="Bold" Foreground="White" />
+            <TextBlock Text="{Binding SelectedScreenshot.FormattedDate, StringFormat='Снято: {0}'}" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <!-- Open in Explorer -->
+            <Button Classes="btn-outline" Command="{Binding OpenInExplorerCommand}" CommandParameter="{Binding SelectedScreenshot}" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconFolderOpen}" Width="12" Height="12" Foreground="White" />
+                <TextBlock Text="В проводнике" FontSize="11" FontWeight="SemiBold" />
+              </StackPanel>
+            </Button>
+
+            <!-- Delete -->
+            <Button Classes="btn-danger" Command="{Binding DeleteScreenshotCommand}" CommandParameter="{Binding SelectedScreenshot}" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="White" />
+                <TextBlock Text="Удалить" FontSize="11" FontWeight="SemiBold" />
+              </StackPanel>
+            </Button>
+
+            <!-- Close Button -->
+            <Button Classes="btn-close" Command="{Binding ClosePreviewCommand}" Width="36" Height="36" Padding="0" CornerRadius="18">
+              <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+          </StackPanel>
+        </Grid>
+
+        <!-- Center: Image with Left & Right Arrows -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+          <!-- Previous Button -->
+          <Button Grid.Column="0" Classes="btn-ghost" Command="{Binding PreviousPreviewCommand}" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="0,0,16,0" ToolTip.Tip="Предыдущий (влево)">
+            <PathIcon Data="{StaticResource IconChevronLeft}" Width="20" Height="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Button>
+
+          <!-- Large Preview Image -->
+          <Border Grid.Column="1" CornerRadius="14" ClipToBounds="True" Background="#0A0910" BorderBrush="#30FFFFFF" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image Source="{Binding SelectedScreenshot.Thumbnail}" Stretch="Uniform" MaxHeight="620" RenderOptions.BitmapInterpolationMode="HighQuality" />
+          </Border>
+
+          <!-- Next Button -->
+          <Button Grid.Column="2" Classes="btn-ghost" Command="{Binding NextPreviewCommand}" Width="48" Height="48" CornerRadius="24" VerticalAlignment="Center" Margin="16,0,0,0" ToolTip.Tip="Следующий (вправо)">
+            <PathIcon Data="{StaticResource IconChevronRight}" Width="20" Height="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Button>
+        </Grid>
+
+        <!-- Bottom Preview Info -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16" Margin="0,12,0,0">
+          <Border Background="#20FFFFFF" CornerRadius="8" Padding="10,4">
+            <TextBlock Text="{Binding SelectedScreenshot.ProfileName, StringFormat='Сборка: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrandAccentBrush}" />
+          </Border>
+          <Border Background="#20FFFFFF" CornerRadius="8" Padding="10,4">
+            <TextBlock Text="{Binding SelectedScreenshot.FormattedSize, StringFormat='Размер: {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" />
+          </Border>
+        </StackPanel>
+
+      </Grid>
+    </Border>
+
+  </Grid>
+</UserControl>

@@ -1,0 +1,331 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             xmlns:views="using:ServantLauncher.Views"
+             xmlns:controls="using:ServantLauncher.Controls"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+              x:Class="ServantLauncher.Views.SkinsView"
+              x:DataType="vm:SkinsViewModel"
+              PointerMoved="OnRootPointerMoved"
+              PointerReleased="OnRootPointerReleased"
+              PointerCaptureLost="OnRootPointerCaptureLost">
+
+  <UserControl.Styles>
+    <Style Selector="Border.card-dragging">
+      <Setter Property="Opacity" Value="0.25" />
+      <Setter Property="RenderTransform" Value="scale(0.95)" />
+      <Setter Property="BorderBrush" Value="#80A78BFA" />
+      <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid Margin="24,12,24,20" RowDefinitions="Auto,*">
+    
+    <!-- Header -->
+    <Border Grid.Row="0" Classes="glass-card" Padding="18" Margin="0,0,0,16">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+          <TextBlock Text="3D ГАЛЕРЕЯ И НАСТРОЙКА СКИНОВ" Classes="heading" FontSize="18" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Интерактивный 3D просмотр персонажа и синхронизация с лицензией Microsoft." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+          <Button Classes="btn-outline" Command="{Binding ResetToMojangSkinCommand}" Padding="16,10" ToolTip.Tip="Загрузить текущий официальный скин из Mojang">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconGlobe}" Width="14" Height="14" Foreground="{DynamicResource BrandAccentBrush}" />
+              <TextBlock Text="Скин из аккаунта" FontWeight="SemiBold" FontSize="12" />
+            </StackPanel>
+          </Button>
+
+          <Button Classes="btn-purple" Click="OnAddSkinClicked" Padding="18,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <PathIcon Data="{StaticResource IconPlus}" Width="14" Height="14" Foreground="White" />
+              <TextBlock Text="Добавить скин (.png)" FontWeight="Bold" FontSize="12" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Main 2-column layout (Preview on Left, Gallery on Right) -->
+    <Grid Grid.Row="1" ColumnDefinitions="360,*">
+      
+      <!-- LEFT: ACTIVE 3D SKIN PREVIEW CARD -->
+      <Border Grid.Column="0" Classes="glass-card" Margin="0,0,16,0" Padding="18">
+        <Grid RowDefinitions="Auto,*,Auto,Auto">
+          
+          <!-- Username & Status -->
+          <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Center" Margin="0,0,0,8">
+            <Border Background="{DynamicResource CardBgHoverBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1" CornerRadius="12" Padding="14,5">
+              <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                <PathIcon Data="{StaticResource IconUser}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="{Binding ActiveAccount.Username, FallbackValue='Лицензионный аккаунт'}" Classes="heading" FontSize="14" FontWeight="Black" Foreground="White" />
+              </StackPanel>
+            </Border>
+            <TextBlock Text="{Binding StatusMessage}" FontSize="11" Foreground="{DynamicResource BrandAccentBrush}" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="320" />
+          </StackPanel>
+
+          <!-- 3D Native Skin Viewer Area (100% Alpha Transparent, Interactive) -->
+          <Border Grid.Row="1" Background="Transparent" CornerRadius="16" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="320">
+            <controls:MinecraftSkin3DControl SkinSource="{Binding ActiveSkinSource}"
+                                             Model="{Binding ActiveModel, Mode=TwoWay}"
+                                             CapeSource="{Binding ActiveCapeSource}"
+                                             HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Stretch" />
+          </Border>
+
+          <!-- Model Variant & Cape Switcher -->
+          <StackPanel Grid.Row="2" Spacing="8" Margin="0,10,0,12">
+            <!-- Format Switcher -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+              <TextBlock Text="Формат рук:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+              <RadioButton Content="Classic (4px)" GroupName="SkinModel" IsChecked="{Binding !IsSlimModel, Mode=TwoWay}" Classes="nav-pill" Padding="10,4" FontSize="11" />
+              <RadioButton Content="Slim (3px)" GroupName="SkinModel" IsChecked="{Binding IsSlimModel, Mode=TwoWay}" Classes="nav-pill" Padding="10,4" FontSize="11" />
+            </StackPanel>
+
+            <!-- Cape Selector (if account has capes) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" IsVisible="{Binding AvailableCapes.Count}">
+              <TextBlock Text="Плащ:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+              <ComboBox ItemsSource="{Binding AvailableCapes}" SelectedItem="{Binding SelectedCape, Mode=TwoWay}" Width="180" Height="30" Padding="8,2" CornerRadius="10" FontSize="11">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Action Buttons: Edit & Apply -->
+          <Grid Grid.Row="3" ColumnDefinitions="*,*" Margin="0,0,0,0">
+            <Button Grid.Column="0" Classes="btn-outline" Command="{Binding OpenEditSkinDialogCommand}" CommandParameter="{Binding SelectedSkin}" Margin="0,0,4,0" Padding="8,11" CornerRadius="16" ToolTip.Tip="Редактировать название и скин">
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                <PathIcon Data="{StaticResource IconEdit}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" />
+                <TextBlock Text="ИЗМЕНИТЬ" Classes="heading" FontSize="11" FontWeight="Bold" />
+              </StackPanel>
+            </Button>
+            <Button Grid.Column="1" Classes="btn-primary" Command="{Binding ApplySkinCommand}" Margin="4,0,0,0" Padding="8,11" CornerRadius="16" ToolTip.Tip="Загрузить скин в аккаунт Microsoft">
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                <PathIcon Data="{StaticResource IconCheck}" Width="13" Height="13" Foreground="#09090B" />
+                <TextBlock Text="В MICROSOFT" Classes="heading" FontSize="11" FontWeight="Black" Foreground="#09090B" />
+              </StackPanel>
+            </Button>
+          </Grid>
+
+        </Grid>
+      </Border>
+
+      <!-- RIGHT: SKINS GALLERY GRID -->
+      <Border Grid.Column="1" Classes="glass-card" Padding="20">
+        <Grid RowDefinitions="Auto,*">
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+            <TextBlock Grid.Column="0" Text="МОИ СОХРАНЕННЫЕ СКИНЫ" Classes="heading" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="Нажмите на скин для предпросмотра" FontSize="11" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+          </Grid>
+          
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding LibrarySkins}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Classes.card-dragging="{Binding IsDragging}" Background="#0EFFFFFF" BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="16" Width="144" Height="190" Margin="0,0,12,12" Padding="8" Cursor="Hand">
+                    <Grid RowDefinitions="*,Auto">
+                      <!-- Skin 3D Bust Thumbnail -->
+                      <Button Classes="btn-ghost" Command="{Binding $parent[UserControl].((vm:SkinsViewModel)DataContext).SelectSkinCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
+                        <Panel>
+                          <Image Source="{Binding PreviewBitmap}" Width="110" Height="130" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="None" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          <!-- Checkmark if active -->
+                          <Border Background="{DynamicResource BrandPurpleBrush}" CornerRadius="12" Width="22" Height="22" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="2" IsVisible="{Binding IsActive}">
+                            <PathIcon Data="{StaticResource IconCheck}" Width="11" Height="11" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                          </Border>
+                        </Panel>
+                      </Button>
+
+                      <!-- Drag Handle, Skin Name, Edit & Delete -->
+                      <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,Auto" Margin="2,6,2,2">
+                        <!-- Drag Handle -->
+                        <Border Grid.Column="0" Background="Transparent" Padding="4,2" CornerRadius="4" Cursor="SizeAll" ToolTip.Tip="Зажмите и перетащите для изменения порядка" PointerPressed="OnSkinDragPointerPressed">
+                          <PathIcon Data="{StaticResource IconGripVertical}" Width="9" Height="9" Foreground="{DynamicResource TextMutedBrush}" />
+                        </Border>
+
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" FontSize="11" Foreground="White" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="2,0,2,0" />
+
+                        <!-- Edit Button -->
+                        <Button Grid.Column="2" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:SkinsViewModel)DataContext).OpenEditSkinDialogCommand}" CommandParameter="{Binding}" Width="22" Height="22" Padding="0" CornerRadius="11" ToolTip.Tip="Редактировать скин" Margin="0,0,3,0">
+                          <PathIcon Data="{StaticResource IconEdit}" Width="9" Height="9" Foreground="{DynamicResource BrandAccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+
+                        <!-- Delete Button -->
+                        <Button Grid.Column="3" Classes="btn-outline" Command="{Binding $parent[UserControl].((vm:SkinsViewModel)DataContext).DeleteSkinCommand}" CommandParameter="{Binding}" Width="22" Height="22" Padding="0" CornerRadius="11" ToolTip.Tip="Удалить из галереи">
+                          <PathIcon Data="{StaticResource IconTrash}" Width="9" Height="9" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+    </Grid>
+
+    <!-- LOADING OVERLAY -->
+    <Border Grid.RowSpan="2" Background="#90000000" IsVisible="{Binding IsLoading}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+      <Border Classes="glass-card" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28,20" CornerRadius="18">
+        <StackPanel Spacing="12" HorizontalAlignment="Center">
+          <ProgressBar IsIndeterminate="True" Width="180" Height="4" Foreground="{DynamicResource BrandAccentBrush}" />
+          <TextBlock Text="Загрузка скина..." FontSize="12" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <!-- ADD SKIN MODAL OVERLAY -->
+    <Border Grid.RowSpan="2" Background="#A0000000" IsVisible="{Binding IsAddSkinDialogOpen}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="10000">
+      <Border Classes="glass-card" Width="460" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="26" CornerRadius="20" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="1.5" BoxShadow="0 24 50 0 #D0000000">
+        <StackPanel Spacing="18">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="ДОБАВЛЕНИЕ СКИНА" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" />
+              <TextBlock Text="Задайте название и выберите формат модели." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding CancelAddSkinCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+              <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+            </Button>
+          </Grid>
+
+          <Grid ColumnDefinitions="120,*" Margin="0,4,0,0">
+            <Border Grid.Column="0" Background="#14FFFFFF" CornerRadius="14" Padding="6" Height="150" VerticalAlignment="Top" BorderBrush="#20FFFFFF" BorderThickness="1">
+              <Image Source="{Binding NewSkinPreviewBitmap}" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="None" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="130" />
+            </Border>
+            <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="12">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Название пресета:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <TextBox Text="{Binding NewSkinName}" Watermark="Введите название скина..." CornerRadius="10" Padding="12,10" FontSize="13" />
+              </StackPanel>
+              <StackPanel Spacing="6">
+                <TextBlock Text="Тип модели:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <Grid ColumnDefinitions="*,*">
+                  <RadioButton Grid.Column="0" Content="Classic (4px)" IsChecked="{Binding !IsNewSkinSlim}" GroupName="AddSkinModelGroup" />
+                  <RadioButton Grid.Column="1" Content="Slim (3px)" IsChecked="{Binding IsNewSkinSlim}" GroupName="AddSkinModelGroup" />
+                </Grid>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4,0,0">
+            <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding CancelAddSkinCommand}" Content="Отмена" Padding="18,10" Margin="0,0,10,0" />
+            <Button Grid.Column="2" Classes="btn-primary" Command="{Binding ConfirmAddSkinCommand}" Padding="22,10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconCheck}" Width="13" Height="13" Foreground="#09090B" />
+                <TextBlock Text="Добавить" FontWeight="Bold" FontSize="12" Foreground="#09090B" />
+              </StackPanel>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <!-- EDIT SKIN PRESET MODAL OVERLAY -->
+    <Border Grid.RowSpan="2" Background="#A0000000" IsVisible="{Binding IsEditSkinDialogOpen}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="10000">
+      <Border Classes="glass-card" Width="490" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="26" CornerRadius="20" BorderBrush="{DynamicResource BrandAccentBrush}" BorderThickness="1.5" BoxShadow="0 24 50 0 #D0000000">
+        <StackPanel Spacing="18">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+              <TextBlock Text="РЕДАКТИРОВАНИЕ СКИНА" Classes="heading" FontSize="16" FontWeight="Black" Foreground="White" />
+              <TextBlock Text="Изменение названия пресета, файла текстуры и типа модели." FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding CancelEditSkinCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+              <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" />
+            </Button>
+          </Grid>
+
+          <Grid ColumnDefinitions="130,*" Margin="0,4,0,0">
+            <Border Grid.Column="0" Background="#14FFFFFF" CornerRadius="14" Padding="6" Height="160" VerticalAlignment="Top" BorderBrush="#20FFFFFF" BorderThickness="1">
+              <Grid RowDefinitions="*,Auto">
+                <Image Source="{Binding EditSkinPreviewBitmap}" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="None" HorizontalAlignment="Center" VerticalAlignment="Center" MaxHeight="120" />
+                <Border Grid.Row="1" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Center" Margin="0,4,0,0">
+                  <TextBlock Text="{Binding EditSkinModelText}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                </Border>
+              </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="1" Margin="16,0,0,0" Spacing="12">
+              <StackPanel Spacing="5">
+                <TextBlock Text="Название пресета:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <TextBox Text="{Binding EditSkinName}" Watermark="Введите название скина..." CornerRadius="10" Padding="12,9" FontSize="13" />
+              </StackPanel>
+
+              <StackPanel Spacing="5">
+                <TextBlock Text="Текстура скина (.png):" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <Button Classes="btn-outline" Click="OnChooseNewSkinFileClicked" HorizontalAlignment="Stretch" Padding="10,8" CornerRadius="10">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <PathIcon Grid.Column="0" Data="{StaticResource IconImage}" Width="13" Height="13" Foreground="{DynamicResource BrandAccentBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding EditSkinFileName}" FontSize="11" Foreground="White" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="Заменить..." FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" Margin="6,0,0,0" VerticalAlignment="Center" />
+                  </Grid>
+                </Button>
+              </StackPanel>
+
+              <StackPanel Spacing="5">
+                <TextBlock Text="Тип модели персонажа:" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextBrightBrush}" />
+                <Grid ColumnDefinitions="*,*">
+                  <RadioButton Grid.Column="0" Content="Classic (4px)" IsChecked="{Binding !IsEditSkinSlim}" GroupName="EditSkinModelGroup" />
+                  <RadioButton Grid.Column="1" Content="Slim (3px)" IsChecked="{Binding IsEditSkinSlim}" GroupName="EditSkinModelGroup" />
+                </Grid>
+              </StackPanel>
+            </StackPanel>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4,0,0">
+            <Button Grid.Column="1" Classes="btn-ghost" Command="{Binding CancelEditSkinCommand}" Content="Отмена" Padding="18,10" Margin="0,0,10,0" />
+            <Button Grid.Column="2" Classes="btn-primary" Command="{Binding ConfirmEditSkinCommand}" Padding="22,10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <PathIcon Data="{StaticResource IconCheck}" Width="13" Height="13" Foreground="#09090B" />
+                <TextBlock Text="Сохранить" FontWeight="Bold" FontSize="12" Foreground="#09090B" />
+              </StackPanel>
+            </Button>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Border>
+
+    <!-- DRAG OVERLAY CANVAS FOR FLOATING DETACHED SKIN CARD -->
+    <Canvas x:Name="DragOverlayCanvas" IsHitTestVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="99999">
+      <Border x:Name="FloatingSkinCard"
+              IsVisible="False"
+              Width="144" Height="190"
+              CornerRadius="16"
+              Padding="8"
+              Classes="glass-card"
+              Background="#2C2442"
+              BorderBrush="{DynamicResource BrandAccentBrush}"
+              BorderThickness="2"
+              BoxShadow="0 18 42 0 #B0000000"
+              Opacity="0.95">
+        <Border.RenderTransform>
+          <TransformGroup>
+            <ScaleTransform ScaleX="1.05" ScaleY="1.05" />
+            <RotateTransform Angle="2.5" />
+          </TransformGroup>
+        </Border.RenderTransform>
+        <Grid RowDefinitions="*,Auto">
+          <Panel>
+            <Image x:Name="FloatingSkinPreview" Width="110" Height="130" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="None" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Panel>
+          <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="2,6,2,2">
+            <PathIcon Data="{StaticResource IconGripVertical}" Width="10" Height="10" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+            <TextBlock x:Name="FloatingSkinName" Grid.Column="1" FontWeight="Bold" FontSize="11" Foreground="White" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="4,0,2,0" />
+          </Grid>
+        </Grid>
+      </Border>
+    </Canvas>
+  </Grid>
+</UserControl>

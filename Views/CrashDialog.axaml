@@ -1,0 +1,88 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="740" d:DesignHeight="660"
+             x:Class="ServantLauncher.Views.CrashDialog"
+             x:DataType="vm:CrashDialogViewModel">
+
+  <Border Classes="glass-card" Background="#F60E0D14" BorderBrush="#EF4444" BorderThickness="1.5" CornerRadius="24" Padding="24" Width="720" MaxHeight="660" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
+      
+      <!-- Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,14">
+        <Border Grid.Column="0" Width="40" Height="40" CornerRadius="12" Background="#280C0C" BorderBrush="#EF4444" BorderThickness="1" Margin="0,0,12,0" VerticalAlignment="Center">
+          <PathIcon Data="{StaticResource IconTrash}" Width="16" Height="16" Foreground="#EF4444" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        
+        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+          <TextBlock Text="{Binding Title}" Classes="heading" FontSize="15" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Произошел сбой при работе или запуске Minecraft." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+
+        <Button Grid.Column="2" Classes="btn-outline" Command="{Binding CloseCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <Separator Grid.Row="0" VerticalAlignment="Bottom" Height="1" Background="#20FFFFFF" />
+
+      <!-- Body / Scrollable Content -->
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,12,0,14">
+        <StackPanel Spacing="12">
+
+          <!-- Error summary -->
+          <Border Background="#1C141E" CornerRadius="12" Padding="12,10" BorderBrush="#35EF4444" BorderThickness="1">
+            <TextBlock Text="{Binding ErrorMessage}" FontSize="12" FontWeight="SemiBold" Foreground="#FCA5A5" TextWrapping="Wrap" />
+          </Border>
+
+          <TextBlock Text="Лог ошибки / стек вызовов:" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center" />
+
+          <!-- Monospace Log Box -->
+          <Border Background="#09080E" CornerRadius="12" BorderBrush="#25FFFFFF" BorderThickness="1" Padding="10" Height="160">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+              <SelectableTextBlock Text="{Binding StackTrace}" FontFamily="Consolas, 'Courier New', monospace" FontSize="11" Foreground="#E2E8F0" TextWrapping="NoWrap" />
+            </ScrollViewer>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Footer Buttons -->
+      <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+          <Button Classes="btn-purple" Command="{Binding CopyErrorToClipboardCommand}" Padding="14,8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconCopy}" Width="12" Height="12" Foreground="White" />
+              <TextBlock Text="Скопировать" FontWeight="Bold" FontSize="11" IsVisible="{Binding !IsCopied}" />
+              <TextBlock Text="Скопировано! ✓" FontWeight="Bold" FontSize="11" Foreground="#34D399" IsVisible="{Binding IsCopied}" />
+            </StackPanel>
+          </Button>
+
+          <Button Classes="btn-outline" Command="{Binding UploadToMcLogsCommand}" IsEnabled="{Binding !IsUploadingMcLogs}" ToolTip.Tip="Загрузить лог на mclo.gs и скопировать ссылку" Padding="14,8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconGlobe}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+              <TextBlock Text="Загрузить на mclo.gs" FontSize="11" FontWeight="SemiBold" />
+            </StackPanel>
+          </Button>
+
+          <Button Classes="btn-outline" Command="{Binding ExportLogsZipCommand}" ToolTip.Tip="Скачать архив со всеми логами и crash-report" Padding="14,8">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <PathIcon Data="{StaticResource IconDownload}" Width="12" Height="12" Foreground="{DynamicResource BrandAccentBrush}" />
+              <TextBlock Text="Скачать архив (.zip)" FontSize="11" FontWeight="SemiBold" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+
+        <TextBlock Grid.Column="1" Text="{Binding ExportStatus}" FontSize="11" Foreground="{DynamicResource EmeraldOnlineBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,0" TextTrimming="CharacterEllipsis" />
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <Button Classes="btn-outline" Command="{Binding OpenConsoleCommand}" Content="Перейти в консоль" Padding="14,8" />
+          <Button Classes="btn-primary" Command="{Binding CloseCommand}" Content="Закрыть" Padding="20,8" />
+        </StackPanel>
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

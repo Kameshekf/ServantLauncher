@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ServantLauncher.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
+             x:Class="ServantLauncher.Views.CreateProfileDialog"
+             x:DataType="vm:CreateProfileViewModel">
+
+  <Border Classes="glass-card" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderPurpleBrush}" BorderThickness="1.5" CornerRadius="24" Padding="24" Width="580" MaxHeight="600" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid RowDefinitions="Auto,*,Auto">
+      
+      <!-- Dialog Header -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+        <StackPanel Grid.Column="0" Spacing="2">
+          <TextBlock Text="СОЗДАНИЕ СБОРКИ" Classes="heading" FontSize="17" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="Выберите версию игры, модлоадер и память." FontSize="11" Foreground="{DynamicResource TextMutedBrush}" />
+        </StackPanel>
+        <Button Grid.Column="1" Classes="btn-outline" Command="{Binding CancelCommand}" Width="32" Height="32" Padding="0" CornerRadius="16">
+          <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Button>
+      </Grid>
+
+      <Separator Grid.Row="0" VerticalAlignment="Bottom" Height="1" Background="#1FFFFFFF" />
+
+      <!-- Scrollable Form Body (fits perfectly inside any resolution) -->
+      <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,12,0,12">
+        <StackPanel Spacing="16">
+          
+          <!-- Profile Name -->
+          <StackPanel Spacing="6">
+            <TextBlock Text="Название сборки" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            <TextBox Text="{Binding Name, Mode=TwoWay}" Watermark="Введите название сборки..." Height="38" />
+          </StackPanel>
+
+          <!-- Version Selection with Releases / Snapshots switch -->
+          <StackPanel Spacing="8">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Версия Minecraft" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" VerticalAlignment="Center" />
+              
+              <!-- Releases / Snapshots tabs -->
+              <Border Grid.Column="1" Background="{DynamicResource CardBgHoverBrush}" CornerRadius="14" Padding="2" BorderBrush="#20FFFFFF" BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                  <RadioButton Content="Релизы" Classes="nav-pill" IsChecked="{Binding !ShowSnapshots, Mode=OneWay}" Click="OnReleasesClicked" FontSize="10" Padding="10,3" />
+                  <RadioButton Content="Снапшоты" Classes="nav-pill" IsChecked="{Binding ShowSnapshots, Mode=OneWay}" Click="OnSnapshotsClicked" FontSize="10" Padding="10,3" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <!-- Search version input -->
+            <TextBox Text="{Binding SearchVersionQuery, Mode=TwoWay}" Watermark="Поиск версии (1.21.4, 25w09a)..." Height="38">
+              <TextBox.InnerLeftContent>
+                <PathIcon Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="{DynamicResource TextMutedBrush}" Margin="10,0,4,0" />
+              </TextBox.InnerLeftContent>
+            </TextBox>
+
+            <!-- Version list dropdown -->
+            <ComboBox ItemsSource="{Binding FilteredVersions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" HorizontalAlignment="Stretch" MaxDropDownHeight="180">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Border Background="{DynamicResource CardBgHoverBrush}" CornerRadius="4" Padding="6,2">
+                      <TextBlock Text="{Binding Type}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+                    </Border>
+                    <TextBlock Text="{Binding Id}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
+          <!-- ModLoader: Vanilla vs Fabric -->
+          <StackPanel Spacing="8">
+            <TextBlock Text="Модлоадер" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+            
+            <Grid ColumnDefinitions="*,*">
+              <Border Grid.Column="0" Margin="0,0,6,0" Classes="glass-card" Padding="10">
+                <RadioButton Content="Vanilla (Чистый)" IsChecked="{Binding !IsFabric, Mode=TwoWay}" GroupName="ModLoaderGroup" FontWeight="SemiBold" FontSize="12" Foreground="White" />
+              </Border>
+              <Border Grid.Column="1" Margin="6,0,0,0" Classes="glass-card" Padding="10">
+                <RadioButton Content="Fabric (Моды)" IsChecked="{Binding IsFabric, Mode=TwoWay}" GroupName="ModLoaderGroup" FontWeight="SemiBold" FontSize="12" Foreground="White" />
+              </Border>
+            </Grid>
+
+            <!-- Fabric Loader Version Selector -->
+            <StackPanel IsVisible="{Binding IsFabric}" Spacing="6" Margin="0,2,0,0">
+              <TextBlock Text="Версия Fabric Loader" FontSize="10" Foreground="{DynamicResource TextMutedBrush}" />
+              <ComboBox ItemsSource="{Binding FabricLoaders}" SelectedItem="{Binding SelectedFabricLoader, Mode=TwoWay}" HorizontalAlignment="Stretch" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- RAM Allocation Slider -->
+          <StackPanel Spacing="6">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Выделение оперативной памяти (RAM)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrandAccentBrush}" />
+              <TextBlock Grid.Column="1" Text="{Binding AllocatedRamMb, StringFormat='{}{0} MB'}" FontSize="11" FontWeight="Bold" Foreground="White" />
+            </Grid>
+            <Slider Minimum="1024" Maximum="16384" SmallChange="512" LargeChange="1024" Value="{Binding AllocatedRamMb, Mode=TwoWay}" />
+          </StackPanel>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Sticky Dialog Action Buttons -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,8,0,0">
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Classes="btn-outline" Command="{Binding CancelCommand}" Content="Отмена" Padding="18,8" />
+          <Button Classes="btn-primary" Command="{Binding CreateCommand}" Content="СОЗДАТЬ СБОРКУ" Padding="22,8" />
+        </StackPanel>
+      </Grid>
+
+    </Grid>
+  </Border>
+</UserControl>

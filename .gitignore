@@ -1,0 +1,54 @@
+## Build and Output Directories
+bin/
+obj/
+dist/
+publish/
+[Bb]in/
+[Oo]bj/
+[Dd]ist/
+
+## NuGet
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Compressed Archives & Installer payload
+*.zip
+*.7z
+*.rar
+*.tar.gz
+payload.zip
+
+## User and IDE-specific files
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.launch
+*.resharper
+*.dotCover
+
+## OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+## Logs and Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+## Sensitive, Environment & Server Deploy files
+.env
+*.env
+upload_to_server.*
+*upload_to_server*
